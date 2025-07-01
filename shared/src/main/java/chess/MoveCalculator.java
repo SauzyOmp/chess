@@ -97,8 +97,8 @@ public class MoveCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+        int[] rowOffsets = {-1, -1, 1, 1};
+        int[] colOffsets = {-1,  1, -1, 1};
 
         for (int i = 0; i < 8; i++) {
             int newRow = currentRow + rowOffsets[i];
@@ -124,8 +124,8 @@ public class MoveCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+        int[] rowOffsets = {-2, -1, 1, 2,  2,  1, -1, -2};
+        int[] colOffsets = { 1,  2, 2, 1, -1, -2, -2, -1};
 
         for (int i = 0; i < 8; i++) {
             int newRow = currentRow + rowOffsets[i];
@@ -151,8 +151,8 @@ public class MoveCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+        int[] rowOffsets = {-1, 1, 0, 0};
+        int[] colOffsets = {0, 0, -1, 1};
 
         for (int i = 0; i < 8; i++) {
             int newRow = currentRow + rowOffsets[i];
@@ -178,8 +178,8 @@ public class MoveCalculator {
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
 
-        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+        int[] rowOffsets = {1};
+        int[] colOffsets = {0};
 
         for (int i = 0; i < 8; i++) {
             int newRow = currentRow + rowOffsets[i];
