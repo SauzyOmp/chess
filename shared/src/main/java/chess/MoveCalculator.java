@@ -1,7 +1,10 @@
 package chess;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+
+import chess.ChessMove;
 
 public class MoveCalculator {
     public static Collection<ChessMove> generateMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
@@ -25,7 +28,7 @@ public class MoveCalculator {
                 return calcPawnMoves(position, board);
         
             default:
-                break;
+                return new ArrayList<>();
         }
     }
 
@@ -38,8 +41,12 @@ public class MoveCalculator {
 
         ChessPiece pieceAtNew = board.getPiece(newPosition);
         if (pieceAtNew == null) {
-            ChessMove newMove = ChessMove(position, newPosition, null);
+            ChessMove newMove = new ChessMove(position, newPosition, null);
+            moves.add(newMove);
         }
+
+
+        return moves;
     }
 
     private static Collection<ChessMove> calcQueenMoves( ChessPosition position, ChessBoard board) {
