@@ -10,22 +10,22 @@ public class MoveCalculator {
     public static Collection<ChessMove> generateMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
         switch (piece.getPieceType()) {
             case KING:
-                return calcKingMoves(position, board);
+                return calcKingMoves(piece, position, board);
 
             case QUEEN:
-                return calcQueenMoves(position, board);
+                return calcQueenMoves(piece, position, board);
             
             case BISHOP:
-                return calcBishopMoves(position, board);
+                return calcBishopMoves(piece, position, board);
             
             case KNIGHT:
-                return calcKnightMoves(position, board);
+                return calcKnightMoves(piece, position, board);
 
             case ROOK:
-                return calcRookMoves(position, board);
+                return calcRookMoves(piece, position, board);
 
             case PAWN:
-                return calcPawnMoves(position, board);
+                return calcPawnMoves(piece, position, board);
         
             default:
                 return new ArrayList<>();
@@ -36,8 +36,10 @@ public class MoveCalculator {
     return row >= 0 && row < 8 && col >= 0 && col < 8;
 }
 
-    private static Collection<ChessMove> calcKingMoves(ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcKingMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -53,19 +55,21 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
-
+    
+    System.out.println(moves);
     return moves;
 }
 
 
-    private static Collection<ChessMove> calcQueenMoves( ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcQueenMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -81,9 +85,8 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
@@ -91,8 +94,10 @@ public class MoveCalculator {
     return moves;
     }
 
-    private static Collection<ChessMove> calcBishopMoves( ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcBishopMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -108,9 +113,8 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
@@ -118,8 +122,11 @@ public class MoveCalculator {
     return moves;
     }
 
-    private static Collection<ChessMove> calcKnightMoves( ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcKnightMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -135,9 +142,8 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
@@ -145,8 +151,11 @@ public class MoveCalculator {
     return moves;
     }
 
-    private static Collection<ChessMove> calcRookMoves( ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcRookMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -162,9 +171,8 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
@@ -172,8 +180,10 @@ public class MoveCalculator {
     return moves;
     }
 
-    private static Collection<ChessMove> calcPawnMoves( ChessPosition position, ChessBoard board) {
+    private static Collection<ChessMove> calcPawnMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
         Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
 
         int currentRow = position.getRow();
         int currentCol = position.getColumn();
@@ -189,9 +199,8 @@ public class MoveCalculator {
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-                if (pieceAtNew == null) {
-                    ChessMove newMove = new ChessMove(position, newPosition, null);
-                    moves.add(newMove);
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
             }
         }
