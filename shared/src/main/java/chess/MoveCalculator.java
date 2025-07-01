@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 
 public class MoveCalculator {
@@ -29,10 +30,15 @@ public class MoveCalculator {
     }
 
     private static Collection<ChessMove> calcKingMoves( ChessPosition position, ChessBoard board) {
-        Collection<ChessMove> moves = new Collection<ChessMove>();
-        ChessPosition newPosition = new ChessPosition(position + 1, position + 1);
-        if (position.getPiece = empty) {
-            moves.add(newPosition)
+        Collection<ChessMove> moves = new ArrayDeque<>();
+
+        int row = position.getRow();
+        int col = position.getColumn();
+        ChessPosition newPosition = new ChessPosition(row + 1, col + 1);
+
+        ChessPiece pieceAtNew = board.getPiece(newPosition);
+        if (pieceAtNew == null) {
+            ChessMove newMove = ChessMove(position, newPosition, null);
         }
     }
 
