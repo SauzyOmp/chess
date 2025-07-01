@@ -75,35 +75,36 @@ private static Collection<ChessMove> calcQueenMoves(ChessPiece piece,
     int startCol = position.getColumn();
     ChessGame.TeamColor myColor = piece.getTeamColor();
 
-    // The 8 compass directions: N, NE, E, SE, S, SW, W, NW
-    int[] dr = {  1,  1,  0, -1, -1, -1,  0,  1 };
-    int[] dc = {  0,  1,  1,  1,  0, -1, -1, -1 };
+        int currentRow = position.getRow();
+        int currentCol = position.getColumn();
 
-    for (int dir = 0; dir < 8; dir++) {
-        int r = startRow + dr[dir];
-        int c = startCol + dc[dir];
+        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
 
-        // keep stepping in this direction until we fall off or hit a piece
-        while (isInBounds(r, c)) {
-            ChessPosition to = new ChessPosition(r, c);
-            ChessPiece occ = board.getPiece(to);
+        for (int i = 0; i < 8; i++) {
+            int rowOffset = rowOffsets[i];
+            int colOffset = colOffsets[i];
 
-            if (occ == null) {
-                // empty square → legal move
-                moves.add(new ChessMove(position, to, null));
-            } else {
-                // occupied: if enemy, capture; then stop sliding
-                if (occ.getTeamColor() != myColor) {
-                    moves.add(new ChessMove(position, to, null));
+            int newRow = currentRow + rowOffset;
+            int newCol = currentCol + colOffset;
+
+            while (isInBounds(newRow, newCol)) {
+                ChessPosition newPosition = new ChessPosition(newRow, newCol);
+                ChessPiece pieceAtNew = board.getPiece(newPosition);
+
+                if (pieceAtNew == null) {
+                    moves.add(new ChessMove(position, newPosition, null));
+                } else {
+                    if (pieceAtNew.getTeamColor() != pieceColor) {
+                        moves.add(new ChessMove(position, newPosition, null));
+                    }
+                    break;
                 }
-                break;
+
+                newRow += rowOffset;
+                newCol += colOffset;
             }
-
-            r += dr[dir];
-            c += dc[dir];
         }
-    }
-
     return moves;
 }
 
