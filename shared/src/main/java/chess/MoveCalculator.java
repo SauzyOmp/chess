@@ -201,35 +201,60 @@ private static Collection<ChessMove> calcQueenMoves(ChessPiece piece,
     private static Collection<ChessMove> calcPawnMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
     Collection<ChessMove> moves = new ArrayList<>();
     ChessGame.TeamColor color = piece.getTeamColor();
+
     int row = position.getRow();
     int col = position.getColumn();
-
     int forward = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
     int startRow = (color == ChessGame.TeamColor.WHITE) ? 2 : 7;
+    int promoRow = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
-    int oneRow = row + forward;
-    if (isInBounds(oneRow, col) && board.getPiece(new ChessPosition(oneRow, col)) == null) {
-        moves.add(new ChessMove(position, new ChessPosition(oneRow, col), null));
+    ChessPiece.PieceType[] promoTypes = {
+        ChessPiece.PieceType.QUEEN,
+        ChessPiece.PieceType.ROOK,
+        ChessPiece.PieceType.BISHOP,
+        ChessPiece.PieceType.KNIGHT
+    };
 
-        int twoRow = row + 2*forward;
-        if (row == startRow
-         && isInBounds(twoRow, col)
-         && board.getPiece(new ChessPosition(twoRow, col)) == null) {
-            moves.add(new ChessMove(position, new ChessPosition(twoRow, col), null));
+    int r1 = row + forward;
+    if (isInBounds(r1, col) && board.getPiece(new ChessPosition(r1, col)) == null) {
+        if (r1 == promoRow) {
+            for (ChessPiece.PieceType pt : promoTypes) {
+                moves.add(new ChessMove(position,
+                                        new ChessPosition(r1, col),
+                                        pt));
+            }
+        } else {
+            moves.add(new ChessMove(position,
+                                    new ChessPosition(r1, col),
+                                    null));
+            int r2 = row + 2 * forward;
+            if (row == startRow
+                && isInBounds(r2, col)
+                && board.getPiece(new ChessPosition(r2, col)) == null) {
+                moves.add(new ChessMove(position,
+                                        new ChessPosition(r2, col),
+                                        null));
+            }
         }
     }
-
-    for (int dc : new int[]{-1, +1}) {
-        int c2 = col + dc;
-        if (!isInBounds(oneRow, c2)) continue;
-        ChessPosition diag = new ChessPosition(oneRow, c2);
+    for (int dc : new int[]{ -1, +1 }) {
+        int c1 = col + dc;
+        if (!isInBounds(r1, c1)) continue;
+        ChessPosition diag = new ChessPosition(r1, c1);
         ChessPiece occ = board.getPiece(diag);
         if (occ != null && occ.getTeamColor() != color) {
-            moves.add(new ChessMove(position, diag, null));
+            if (r1 == promoRow) {
+                for (ChessPiece.PieceType pt : promoTypes) {
+                    moves.add(new ChessMove(position, diag, pt));
+                }
+            } else {
+                moves.add(new ChessMove(position, diag, null));
+            }
         }
     }
 
     return moves;
 }
+
 
 }
