@@ -29,7 +29,11 @@ public class MoveCalculator {
     }
 
     private static Collection<ChessMove> calcKingMoves( ChessPosition position, ChessBoard board) {
-        
+        Collection<ChessMove> moves = new Collection<ChessMove>();
+        ChessPosition newPosition = new ChessPosition(position + 1, position + 1);
+        if (position.getPiece = empty) {
+            moves.add(newPosition)
+        }
     }
 
     private static Collection<ChessMove> calcQueenMoves( ChessPosition position, ChessBoard board) {
