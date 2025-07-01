@@ -15,11 +15,34 @@ public class ChessMove {
     private final PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
-                     ChessPiece.PieceType promotionPiece) {
-                        this.startPosition = startPosition;
-                        this.endPosition = endPosition;
-                        this.promotionPiece = promotionPiece;
+        ChessPiece.PieceType promotionPiece) {
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+        this.promotionPiece = promotionPiece;
     }
+
+    @Override
+    public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ChessMove that = (ChessMove) o;
+
+    return startPosition.equals(that.startPosition) &&
+        endPosition.equals(that.endPosition) &&
+        ((promotionPiece == null && that.promotionPiece == null) || 
+        (promotionPiece != null && promotionPiece.equals(that.promotionPiece)));
+}
+
+    @Override
+    public int hashCode() {
+    int result = startPosition.hashCode();
+    result = 31 * result + endPosition.hashCode();
+    result = 31 * result + (promotionPiece != null ? promotionPiece.hashCode() : 0);
+    return result;
+}
+
+
 
     /**
      * @return ChessPosition of starting location
@@ -42,6 +65,6 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 }
