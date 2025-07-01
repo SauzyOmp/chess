@@ -25,10 +25,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        int r = position.getRow() - 1;
-        int c = position.getColumn() - 1;
-        if (r < 0 || r >= 8 || c < 0 || c >= 8) return null;
-        return board[r][c];
+        return board[8 - position.getRow()][position.getColumn() - 1];
     }
 
     /**

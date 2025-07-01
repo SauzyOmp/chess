@@ -66,68 +66,67 @@ public class MoveCalculator {
 }
 
 
-private static Collection<ChessMove> calcQueenMoves(ChessPiece piece,
-    ChessPosition position,
-    ChessBoard board) {
+    private static Collection<ChessMove> calcQueenMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
     Collection<ChessMove> moves = new ArrayList<>();
+    ChessGame.TeamColor pieceColor = piece.getTeamColor();
 
-    int startRow = position.getRow();
-    int startCol = position.getColumn();
-    ChessGame.TeamColor myColor = piece.getTeamColor();
+    int currentRow = position.getRow();
+    int currentCol = position.getColumn();
 
-        int currentRow = position.getRow();
-        int currentCol = position.getColumn();
+    int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
 
-        int[] rowOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-        int[] colOffsets = {-1,  0,  1, -1, 1, -1, 0, 1};
+    for (int i = 0; i < 8; i++) {
+        int rowOffset = rowOffsets[i];
+        int colOffset = colOffsets[i];
 
-        for (int i = 0; i < 8; i++) {
-            int rowOffset = rowOffsets[i];
-            int colOffset = colOffsets[i];
+        int newRow = currentRow + rowOffset;
+        int newCol = currentCol + colOffset;
 
-            int newRow = currentRow + rowOffset;
-            int newCol = currentCol + colOffset;
+        while (isInBounds(newRow, newCol)) {
+            ChessPosition newPosition = new ChessPosition(newRow, newCol);
+            ChessPiece pieceAtNew = board.getPiece(newPosition);
 
-            while (isInBounds(newRow, newCol)) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece pieceAtNew = board.getPiece(newPosition);
-
-                if (pieceAtNew == null) {
+            if (pieceAtNew == null) {
+                moves.add(new ChessMove(position, newPosition, null));
+            } else {
+                if (pieceAtNew.getTeamColor() != pieceColor) {
                     moves.add(new ChessMove(position, newPosition, null));
-                } else {
-                    if (pieceAtNew.getTeamColor() != pieceColor) {
-                        moves.add(new ChessMove(position, newPosition, null));
-                    }
-                    break;
                 }
-
-                newRow += rowOffset;
-                newCol += colOffset;
+                break; // stop in that direction
             }
+
+            newRow += rowOffset;
+            newCol += colOffset;
         }
+    }
+
     return moves;
 }
 
-    private static Collection<ChessMove> calcBishopMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
-    Collection<ChessMove> moves = new ArrayList<>();
-    ChessGame.TeamColor myColor = piece.getTeamColor();
-    int startRow = position.getRow();
-    int startCol = position.getColumn();
+
+
+    private static Collection<ChessMove> calcBishopMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        ChessGame.TeamColor pieceColor = piece.getTeamColor();
+
+        int currentRow = position.getRow() - 1;
+        int currentCol = position.getColumn() - 1;
 
     int[] dr = {  1,  1, -1, -1 };
     int[] dc = {  1, -1,  1, -1 };
 
-    for (int dir = 0; dir < 4; dir++) {
-        int r = startRow + dr[dir];
-        int c = startCol + dc[dir];
-        while (isInBounds(r, c)) {
-            ChessPosition to = new ChessPosition(r, c);
-            ChessPiece occ = board.getPiece(to);
-            if (occ == null) {
-                moves.add(new ChessMove(position, to, null));
-            } else {
-                if (occ.getTeamColor() != myColor) {
-                    moves.add(new ChessMove(position, to, null));
+        for (int i = 0; i < 8; i++) {
+            int newRow = currentRow + rowOffsets[i];
+            int newCol = currentCol + colOffsets[i];
+
+            if (isInBounds(newRow, newCol)) {
+                ChessPosition newPosition = new ChessPosition(newRow + 1, newCol + 1);
+                ChessPiece pieceAtNew = board.getPiece(newPosition);
+
+                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
+                moves.add(new ChessMove(position, newPosition, null));
                 }
                 break;
             }
