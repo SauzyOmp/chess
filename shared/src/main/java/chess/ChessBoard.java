@@ -21,11 +21,13 @@ public class ChessBoard {
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
-     * @return Either the piece at the position, or null if no piece is at that
-     * position
+     * @return the piece at that square
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[8 - position.getRow()][position.getColumn() - 1];
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        if (r < 0 || r >= 8 || c < 0 || c >= 8) return null;
+        return board[r][c];
     }
 
     /**
