@@ -106,27 +106,27 @@ public class MoveCalculator {
 
 
 
-    private static Collection<ChessMove> calcBishopMoves(ChessPiece piece,  ChessPosition position, ChessBoard board) {
-        Collection<ChessMove> moves = new ArrayList<>();
+    private static Collection<ChessMove> calcBishopMoves(ChessPiece piece,
+                                                     ChessPosition position,
+                                                     ChessBoard board) {
+    Collection<ChessMove> moves = new ArrayList<>();
+    ChessGame.TeamColor myColor = piece.getTeamColor();
+    int r0 = position.getRow(), c0 = position.getColumn();
 
-        ChessGame.TeamColor pieceColor = piece.getTeamColor();
-
-        int currentRow = position.getRow() - 1;
-        int currentCol = position.getColumn() - 1;
-
+    // only diagonals
     int[] dr = {  1,  1, -1, -1 };
     int[] dc = {  1, -1,  1, -1 };
 
-        for (int i = 0; i < 8; i++) {
-            int newRow = currentRow + rowOffsets[i];
-            int newCol = currentCol + colOffsets[i];
-
-            if (isInBounds(newRow, newCol)) {
-                ChessPosition newPosition = new ChessPosition(newRow + 1, newCol + 1);
-                ChessPiece pieceAtNew = board.getPiece(newPosition);
-
-                if (pieceAtNew == null || pieceAtNew.getTeamColor() != pieceColor) {
-                moves.add(new ChessMove(position, newPosition, null));
+    for (int dir = 0; dir < 4; dir++) {
+        int r = r0 + dr[dir], c = c0 + dc[dir];
+        while (isInBounds(r, c)) {
+            ChessPosition to = new ChessPosition(r, c);
+            ChessPiece occ = board.getPiece(to);
+            if (occ == null) {
+                moves.add(new ChessMove(position, to, null));
+            } else {
+                if (occ.getTeamColor() != myColor) {
+                    moves.add(new ChessMove(position, to, null));
                 }
                 break;
             }
@@ -134,7 +134,6 @@ public class MoveCalculator {
             c += dc[dir];
         }
     }
-
     return moves;
 }
 
