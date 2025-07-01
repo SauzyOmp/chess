@@ -1,17 +1,9 @@
 package chess;
 
-/**
- * A chessboard that can hold and rearrange chess pieces.
- * <p>
- * Note: You can add to this class, but you may not alter
- * signature of the existing methods.
- */
 public class ChessBoard {
-    private ChessPiece [][] board = new ChessPiece[8][8];
+    private final ChessPiece[][] board = new ChessPiece[8][8];
 
-    public ChessBoard() {
-        
-    }
+    public ChessBoard() { }
 
     /**
      * Adds a chess piece to the chessboard
@@ -20,7 +12,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()][position.getColumn()] = piece;
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        board[r][c] = piece;
     }
 
     /**
@@ -31,12 +25,14 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()][position.getColumn()];
+        int r = position.getRow() - 1;
+        int c = position.getColumn() - 1;
+        if (r < 0 || r >= 8 || c < 0 || c >= 8) return null;
+        return board[r][c];
     }
 
     /**
      * Sets the board to the default starting board
-     * (How the game of chess normally starts)
      */
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
