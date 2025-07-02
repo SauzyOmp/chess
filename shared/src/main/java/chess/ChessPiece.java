@@ -2,7 +2,6 @@ package chess;
 
 import java.util.Collection;
 import chess.ChessGame.TeamColor;
-import chess.MoveCalculator;
 
 /**
  * Represents a single chess piece
