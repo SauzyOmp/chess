@@ -32,6 +32,21 @@ public class ChessPiece {
         PAWN
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChessPiece)) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor
+            && type       == that.type;
+    }
+
+@Override
+public int hashCode() {
+    return 31 * pieceColor.hashCode() + type.hashCode();
+}
+
+
     /**
      * @return Which team this chess piece belongs to
      */
