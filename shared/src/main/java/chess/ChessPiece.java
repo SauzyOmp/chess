@@ -40,10 +40,10 @@ public class ChessPiece {
             && type       == that.type;
     }
 
-@Override
-public int hashCode() {
-    return 31 * pieceColor.hashCode() + type.hashCode();
-}
+    @Override
+    public int hashCode() {
+        return 31 * pieceColor.hashCode() + type.hashCode();
+    }
 
 
     /**
