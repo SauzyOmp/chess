@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import chess.ChessBoard;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -50,7 +51,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece startPiece = board.getPiece(startPosition);
+        if (startPiece != null) {
+            Collection<ChessMove> initialSet = startPiece.pieceMoves(board, startPosition);
+            return
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -100,7 +107,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        board.resetBoard();
     }
 
     /**
@@ -109,6 +116,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
