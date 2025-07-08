@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import chess.ChessBoard;
 
@@ -51,13 +52,23 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece startPiece = board.getPiece(startPosition);
         if (startPiece != null) {
             Collection<ChessMove> initialSet = startPiece.pieceMoves(board, startPosition);
-            return
-        } else {
-            return null;
+            for (ChessMove testMove : initialSet) {
+                ChessBoard scratchBoard = new ChessBoard();
+                scratchBoard = board;
+                try {
+                    makeMove(testMove);
+                } catch (InvalidMoveException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            
         }
+        return validMoves;
     }
 
     /**

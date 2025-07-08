@@ -103,18 +103,6 @@ public class ChessBoard {
             board[rr][cc] = null;
         }
     }
-
-    ChessPiece.PieceType[] backRank = {
-        ChessPiece.PieceType.ROOK,
-        ChessPiece.PieceType.KNIGHT,
-        ChessPiece.PieceType.BISHOP,
-        ChessPiece.PieceType.QUEEN,
-        ChessPiece.PieceType.KING,
-        ChessPiece.PieceType.BISHOP,
-        ChessPiece.PieceType.KNIGHT,
-        ChessPiece.PieceType.ROOK
-    };
-
     for (int col = 1; col <= 8; col++) {
         addPiece(new ChessPosition(1, col),
             new ChessPiece(ChessGame.TeamColor.WHITE, backRank[col-1]));
@@ -130,4 +118,30 @@ public class ChessBoard {
     }
 }
 
+        public ChessBoard createScratchBoard() {
+        ChessBoard scratch = new ChessBoard();
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPiece p = this.getPiece(new ChessPosition(row, col));
+                if (p != null) {
+                    scratch.addPiece(
+                        new ChessPosition(row, col),
+                        new ChessPiece(p.getTeamColor(), p.getPieceType())
+                    );
+                }
+            }
+        }
+        return scratch;
+    }
+
+    ChessPiece.PieceType[] backRank = {
+        ChessPiece.PieceType.ROOK,
+        ChessPiece.PieceType.KNIGHT,
+        ChessPiece.PieceType.BISHOP,
+        ChessPiece.PieceType.QUEEN,
+        ChessPiece.PieceType.KING,
+        ChessPiece.PieceType.BISHOP,
+        ChessPiece.PieceType.KNIGHT,
+        ChessPiece.PieceType.ROOK
+    };
 }
