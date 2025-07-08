@@ -2,6 +2,8 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+
 import chess.ChessBoard;
 
 /**
@@ -54,22 +56,62 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece startPiece = board.getPiece(startPosition);
-        if (startPiece != null) {
-            Collection<ChessMove> initialSet = startPiece.pieceMoves(board, startPosition);
-            for (ChessMove testMove : initialSet) {
-                ChessBoard scratchBoard = new ChessBoard();
-                scratchBoard = board;
-                try {
-                    makeMove(testMove);
-                } catch (InvalidMoveException e) {
-                    e.printStackTrace();
+        if (startPiece == null) {
+            return validMoves;
+        }
+
+        TeamColor pieceColor = startPiece.getTeamColor();
+
+        for (ChessMove candidate : startPiece.pieceMoves(board, startPosition)) {
+            ChessBoard scratch = board.createScratchBoard();
+
+            ChessPiece moved = scratch.getPiece(startPosition);
+            scratch.addPiece(startPosition, null);
+            scratch.addPiece(candidate.getEndPosition(), moved);
+
+            ChessPosition kingPos = null;
+            outer:
+            for (int r = 1; r <= 8; r++) {
+                for (int c = 1; c <= 8; c++) {
+                    ChessPosition p = new ChessPosition(r, c);
+                    ChessPiece cp = scratch.getPiece(p);
+                    if (cp != null
+                        && cp.getTeamColor() == pieceColor
+                        && cp.getPieceType() == ChessPiece.PieceType.KING) {
+                        kingPos = p;
+                        break outer;
+                    }
                 }
             }
-            
-            
+            if (kingPos == null) {
+                continue;
+            }
+
+            boolean kingInCheck = false;
+            outer2:
+            for (int r = 1; r <= 8; r++) {
+                for (int c = 1; c <= 8; c++) {
+                    ChessPosition p = new ChessPosition(r, c);
+                    ChessPiece cp = scratch.getPiece(p);
+                    if (cp != null && cp.getTeamColor() != pieceColor) {
+                        for (ChessMove opp : cp.pieceMoves(scratch, p)) {
+                            if (opp.getEndPosition().equals(kingPos)) {
+                                kingInCheck = true;
+                                break outer2;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!kingInCheck) {
+                validMoves.add(candidate);
+            }
         }
+
         return validMoves;
     }
+
 
     /**
      * Makes a move in a chess game
@@ -118,7 +160,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        board.resetBoard();
+        this.board = board;
     }
 
     /**
@@ -129,4 +171,19 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChessGame)) return false;
+        ChessGame other = (ChessGame) o;
+        return Objects.equals(this.board, other.board)
+            && this.currentTurnColor == other.currentTurnColor;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(board, currentTurnColor);
+    }
+
 }
