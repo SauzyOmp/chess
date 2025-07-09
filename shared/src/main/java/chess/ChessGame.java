@@ -113,15 +113,56 @@ public class ChessGame {
     }
 
 
-    /**
-     * Makes a move in a chess game
-     *
-     * @param move chess move to perform
-     * @throws InvalidMoveException if move is invalid
-     */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+/**
+ * Makes a move in a chess game
+ *
+ * @param move chess move to perform
+ * @throws InvalidMoveException if move is invalid
+ */
+public void makeMove(ChessMove move) throws InvalidMoveException {
+    if (move == null) {
+        throw new InvalidMoveException("Move cannot be null");
     }
+
+    ChessPosition from = move.getStartPosition();
+    ChessPosition to   = move.getEndPosition();
+    ChessPiece piece   = board.getPiece(from);
+    if (piece == null) {
+        throw new InvalidMoveException("No piece at " + from);
+    }
+    if (piece.getTeamColor() != currentTurnColor) {
+        throw new InvalidMoveException("It's " + currentTurnColor + "'s turn");
+    }
+    Collection<ChessMove> legal = validMoves(from);
+    if (!legal.contains(move)) {
+        throw new InvalidMoveException(
+            "Illegal move from " + from + " to " + to
+        );
+    }
+    ChessPiece.PieceType promo = move.getPromotionPiece();
+    if (promo != null) {
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            throw new InvalidMoveException("Only pawns can promote");
+        }
+        int destRow = to.getRow();
+        boolean validRank = (piece.getTeamColor() == TeamColor.WHITE && destRow == 8)
+                         || (piece.getTeamColor() == TeamColor.BLACK && destRow == 1);
+        if (!validRank) {
+            throw new InvalidMoveException("Pawn may only promote on the last rank");
+        }
+        board.addPiece(to, new ChessPiece(piece.getTeamColor(), promo));
+    } else {
+        board.addPiece(to, piece);
+    }
+    board.addPiece(from, null);
+
+    currentTurnColor = (currentTurnColor == TeamColor.WHITE)
+        ? TeamColor.BLACK
+        : TeamColor.WHITE;
+}
+
+
+
 
     /**
      * Determines if the given team is in check
