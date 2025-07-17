@@ -1,10 +1,19 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.InMemoryDataAccess;
-import service.*;
+import service.CreateGameRequest;
+import service.CreateGameResult;
+import service.GameService;
+import service.GamesResult;
+import service.JoinGameRequest;
+import service.LoginRequest;
+import service.LoginResult;
+import service.RegisterRequest;
+import service.UserService;
 
 import java.util.Map;
 
@@ -19,8 +28,18 @@ public class Server {
     public int run(int desiredPort) {
         port(desiredPort);
         staticFiles.location("web");
-
         before((req, res) -> res.type("application/json"));
+
+        delete("/db", (req, res) -> {
+            try {
+                dao.clear();
+                res.status(200);
+                return "{}";
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            }
+        });
 
         post("/user", (req, res) -> {
             try {
@@ -28,8 +47,18 @@ public class Server {
                 var result = userService.register(r);
                 res.status(200);
                 return gson.toJson(result);
+            } catch (JsonSyntaxException e) {
+                res.status(400);
+                return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
-                res.status(e.getMessage().contains("taken") ? 403 : 400);
+                if (e.getMessage().toLowerCase().contains("taken")) {
+                    res.status(403);
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
@@ -37,12 +66,18 @@ public class Server {
         post("/session", (req, res) -> {
             try {
                 LoginRequest r = gson.fromJson(req.body(), LoginRequest.class);
-                var result = userService.login(r);
+                LoginResult result = userService.login(r);
                 res.status(200);
                 return gson.toJson(result);
+            } catch (JsonSyntaxException e) {
+                res.status(400);
+                return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
                 res.status(401);
-                return gson.toJson(Map.of("message", "Error: username/password incorrect"));
+                return gson.toJson(Map.of("message", "Error: unauthorized"));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
@@ -55,6 +90,9 @@ public class Server {
             } catch (DataAccessException e) {
                 res.status(401);
                 return gson.toJson(Map.of("message", "Error: unauthorized"));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
@@ -66,6 +104,9 @@ public class Server {
                 return gson.toJson(games);
             } catch (DataAccessException e) {
                 res.status(401);
+                return gson.toJson(Map.of("message", "Error: unauthorized"));
+            } catch (Exception e) {
+                res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
@@ -77,12 +118,19 @@ public class Server {
                 CreateGameResult createRes = gameService.createGame(token, createReq);
                 res.status(200);
                 return gson.toJson(createRes);
-            } catch (DataAccessException e) {
-                res.status(e.getMessage().toLowerCase().contains("unauthorized") ? 401 : 400);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-            } catch (Exception e) {
+            } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
+            } catch (DataAccessException e) {
+                if (e.getMessage().toLowerCase().contains("unauthorized")) {
+                    res.status(401);
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
@@ -93,14 +141,22 @@ public class Server {
                 gameService.joinGame(token, joinReq);
                 res.status(200);
                 return "{}";
-            } catch (DataAccessException e) {
-                String msg = e.getMessage().toLowerCase();
-                int code = msg.contains("unauthorized") ? 401 : msg.contains("game full") ? 403 : 400;
-                res.status(code);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-            } catch (Exception e) {
+            } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
+            } catch (DataAccessException e) {
+                String msg = e.getMessage().toLowerCase();
+                if (msg.contains("unauthorized")) {
+                    res.status(401);
+                } else if (msg.contains("taken") || msg.contains("full")) {
+                    res.status(403);
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
