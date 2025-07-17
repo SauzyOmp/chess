@@ -1,18 +1,38 @@
 package server;
 
+import com.google.gson.Gson;
+import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
+import dataaccess.InMemoryDataAccess;
+import service.RegisterRequest;
+import service.UserService;
 import spark.*;
 
+import java.util.Map;
+
+import static spark.Spark.post;
+
 public class Server {
+    private final Gson gson = new Gson();
+    private final DataAccess dao = new InMemoryDataAccess();
+    private final UserService userService = new UserService(dao);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
-        // Register your endpoints and handle exceptions here.
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        post("/user", (req, res) -> {
+            try {
+                RegisterRequest r = gson.fromJson(req.body(), RegisterRequest.class);
+                var result = userService.register(r);
+                res.status(200);
+                return gson.toJson(result);
+            } catch (DataAccessException e) {
+                res.status( e.getMessage().contains("taken") ? 403 : 400 );
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            }
+        });
 
         Spark.awaitInitialization();
         return Spark.port();

@@ -16,11 +16,17 @@ public class GameServiceTests {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);
-        var reg = userService.register(new RegisterRequest("Reginald I", "pw1", "r1@email.com"));
-        gameService.createGame(reg.authToken(), new CreateGameRequest("Reginald's Arena"));
+
+        var reg1 = userService.register(
+                new RegisterRequest("Reginald I", "pw1", "r1@emails.com")
+        );
+        gameService.createGame(reg1.authToken(), new CreateGameRequest("Reginald's Arena"));
         gameService.clear();
-        var empty = gameService.listGames(reg.authToken()).games();
-        assertTrue(empty.isEmpty());
+        var king = userService.register(
+                new RegisterRequest("King Reginald", "royalPW", "king@kinglyemails.com")
+        );
+        List<GameData> games = gameService.listGames(king.authToken()).games();
+        assertTrue(games.isEmpty());
     }
 
     @Test
