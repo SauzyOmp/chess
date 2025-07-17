@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.InMemoryDataAccess;
+import service.LoginRequest;
 import service.RegisterRequest;
 import service.UserService;
 import spark.*;
 
 import java.util.Map;
 
+import static spark.Spark.delete;
 import static spark.Spark.post;
 
 public class Server {
@@ -33,6 +35,31 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
+
+        post("/session", (req, res) -> {
+            try {
+                var r = gson.fromJson(req.body(), LoginRequest.class);
+                var result = userService.login(r);
+                res.status(200);
+                return gson.toJson(result);
+            } catch (DataAccessException e) {
+                res.status(401);
+                return gson.toJson(Map.of("message", "Error: username/password incorrect"));
+            }
+        });
+
+        delete("/session", (req, res) -> {
+            String token = req.headers("Authorization");
+            try {
+                userService.logout(token);
+                res.status(200);
+                return "{}";
+            } catch (DataAccessException e) {
+                res.status(401);
+                return gson.toJson(Map.of("message", "Error: unauthorized"));
+            }
+        });
+
 
         Spark.awaitInitialization();
         return Spark.port();
