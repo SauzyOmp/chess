@@ -4,25 +4,23 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.InMemoryDataAccess;
-import service.LoginRequest;
-import service.RegisterRequest;
-import service.UserService;
-import spark.*;
+import service.*;
 
 import java.util.Map;
 
-import static spark.Spark.delete;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class Server {
     private final Gson gson = new Gson();
     private final DataAccess dao = new InMemoryDataAccess();
     private final UserService userService = new UserService(dao);
+    private final GameService gameService = new GameService(dao);
 
     public int run(int desiredPort) {
-        Spark.port(desiredPort);
+        port(desiredPort);
+        staticFiles.location("web");
 
-        Spark.staticFiles.location("web");
+        before((req, res) -> res.type("application/json"));
 
         post("/user", (req, res) -> {
             try {
@@ -31,14 +29,14 @@ public class Server {
                 res.status(200);
                 return gson.toJson(result);
             } catch (DataAccessException e) {
-                res.status( e.getMessage().contains("taken") ? 403 : 400 );
+                res.status(e.getMessage().contains("taken") ? 403 : 400);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
         post("/session", (req, res) -> {
             try {
-                var r = gson.fromJson(req.body(), LoginRequest.class);
+                LoginRequest r = gson.fromJson(req.body(), LoginRequest.class);
                 var result = userService.login(r);
                 res.status(200);
                 return gson.toJson(result);
@@ -60,13 +58,58 @@ public class Server {
             }
         });
 
+        get("/game", (req, res) -> {
+            try {
+                String token = req.headers("Authorization");
+                GamesResult games = gameService.listGames(token);
+                res.status(200);
+                return gson.toJson(games);
+            } catch (DataAccessException e) {
+                res.status(401);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            }
+        });
 
-        Spark.awaitInitialization();
-        return Spark.port();
+        post("/game", (req, res) -> {
+            try {
+                String token = req.headers("Authorization");
+                CreateGameRequest createReq = gson.fromJson(req.body(), CreateGameRequest.class);
+                CreateGameResult createRes = gameService.createGame(token, createReq);
+                res.status(200);
+                return gson.toJson(createRes);
+            } catch (DataAccessException e) {
+                res.status(e.getMessage().toLowerCase().contains("unauthorized") ? 401 : 400);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(400);
+                return gson.toJson(Map.of("message", "Error: bad request"));
+            }
+        });
+
+        put("/game", (req, res) -> {
+            try {
+                String token = req.headers("Authorization");
+                JoinGameRequest joinReq = gson.fromJson(req.body(), JoinGameRequest.class);
+                gameService.joinGame(token, joinReq);
+                res.status(200);
+                return "{}";
+            } catch (DataAccessException e) {
+                String msg = e.getMessage().toLowerCase();
+                int code = msg.contains("unauthorized") ? 401 : msg.contains("game full") ? 403 : 400;
+                res.status(code);
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(400);
+                return gson.toJson(Map.of("message", "Error: bad request"));
+            }
+        });
+
+        awaitInitialization();
+        return port();
     }
 
     public void stop() {
-        Spark.stop();
-        Spark.awaitStop();
+        stop();
+        awaitStop();
     }
 }
