@@ -14,6 +14,7 @@ import service.LoginRequest;
 import service.LoginResult;
 import service.RegisterRequest;
 import service.UserService;
+import spark.Spark;
 
 import java.util.Map;
 
@@ -44,6 +45,10 @@ public class Server {
         post("/user", (req, res) -> {
             try {
                 RegisterRequest r = gson.fromJson(req.body(), RegisterRequest.class);
+                if (r.username() == null || r.password() == null || r.email() == null) {
+                    res.status(400);
+                    return gson.toJson(Map.of("message", "Error: bad request"));
+                }
                 var result = userService.register(r);
                 res.status(200);
                 return gson.toJson(result);
@@ -57,15 +62,16 @@ public class Server {
                     res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-            } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
         post("/session", (req, res) -> {
             try {
                 LoginRequest r = gson.fromJson(req.body(), LoginRequest.class);
+                if (r.username() == null || r.password() == null) {
+                    res.status(400);
+                    return gson.toJson(Map.of("message", "Error: bad request"));
+                }
                 LoginResult result = userService.login(r);
                 res.status(200);
                 return gson.toJson(result);
@@ -75,9 +81,6 @@ public class Server {
             } catch (DataAccessException e) {
                 res.status(401);
                 return gson.toJson(Map.of("message", "Error: unauthorized"));
-            } catch (Exception e) {
-                res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
@@ -114,10 +117,14 @@ public class Server {
         post("/game", (req, res) -> {
             try {
                 String token = req.headers("Authorization");
-                CreateGameRequest createReq = gson.fromJson(req.body(), CreateGameRequest.class);
-                CreateGameResult createRes = gameService.createGame(token, createReq);
+                CreateGameRequest r = gson.fromJson(req.body(), CreateGameRequest.class);
+                if (r.gameName() == null) {
+                    res.status(400);
+                    return gson.toJson(Map.of("message", "Error: bad request"));
+                }
+                CreateGameResult result = gameService.createGame(token, r);
                 res.status(200);
-                return gson.toJson(createRes);
+                return gson.toJson(result);
             } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
@@ -125,11 +132,8 @@ public class Server {
                 if (e.getMessage().toLowerCase().contains("unauthorized")) {
                     res.status(401);
                 } else {
-                    res.status(500);
+                    res.status(400);
                 }
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
-            } catch (Exception e) {
-                res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
@@ -137,8 +141,13 @@ public class Server {
         put("/game", (req, res) -> {
             try {
                 String token = req.headers("Authorization");
-                JoinGameRequest joinReq = gson.fromJson(req.body(), JoinGameRequest.class);
-                gameService.joinGame(token, joinReq);
+                JoinGameRequest r = gson.fromJson(req.body(), JoinGameRequest.class);
+                if (r.playerColor() == null
+                        || !(r.playerColor().equals("WHITE") || r.playerColor().equals("BLACK"))) {
+                    res.status(400);
+                    return gson.toJson(Map.of("message", "Error: bad request"));
+                }
+                gameService.joinGame(token, r);
                 res.status(200);
                 return "{}";
             } catch (JsonSyntaxException e) {
@@ -151,7 +160,7 @@ public class Server {
                 } else if (msg.contains("taken") || msg.contains("full")) {
                     res.status(403);
                 } else {
-                    res.status(500);
+                    res.status(400);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
@@ -165,7 +174,7 @@ public class Server {
     }
 
     public void stop() {
-        stop();
-        awaitStop();
+        Spark.stop();
+        Spark.awaitStop();
     }
 }
