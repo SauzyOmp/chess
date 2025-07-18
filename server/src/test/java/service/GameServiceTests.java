@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.InMemoryDataAccess;
 import dataaccess.DataAccessException;
-import Model.GameData;
+import model.GameData;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

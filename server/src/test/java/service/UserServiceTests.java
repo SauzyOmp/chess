@@ -2,8 +2,6 @@ package service;
 
 import dataaccess.InMemoryDataAccess;
 import dataaccess.DataAccessException;
-import Model.AuthData;
-import Model.UserData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

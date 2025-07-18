@@ -2,8 +2,8 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import Model.UserData;
-import Model.AuthData;
+import model.UserData;
+import model.AuthData;
 
 public class UserService {
     private final DataAccess dao;

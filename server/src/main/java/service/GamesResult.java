@@ -1,6 +1,6 @@
 package service;
 
-import Model.GameData;
+import model.GameData;
 
 import java.util.List;
 
