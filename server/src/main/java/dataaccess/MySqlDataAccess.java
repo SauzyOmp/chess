@@ -1,88 +1,71 @@
 package dataaccess;
 
-import chess.ChessGame;
-import model.AuthData;
-import model.GameData;
 import model.UserData;
+import model.GameData;
+import model.AuthData;
+import java.sql.SQLException;
+import java.util.List;
 
-import java.util.*;
-
-public class MySqlDataAccess {
-    private final Map<String, UserData> users = new HashMap<>();
-    private final Map<Integer, GameData> games = new HashMap<>();
-    private final Map<String, AuthData> auths = new HashMap<>();
-    private int GameID = 1;
+/**
+ * MySQL-backed implementation of DataAccess.
+ */
+public class MySqlDataAccess implements DataAccess {
 
     @Override
-    public void clear() {
-        users.clear();
-        games.clear();
-        auths.clear();
-        GameID = 1;
+    public void clear() throws DataAccessException {
+        // (example of implemented method)
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.createStatement()) {
+            stmt.execute("TRUNCATE TABLE Auths");
+            stmt.execute("TRUNCATE TABLE Games");
+            stmt.execute("TRUNCATE TABLE Users");
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to clear tables", e);
+        }
     }
 
     @Override
     public void createUser(UserData u) throws DataAccessException {
-        if (users.containsKey(u.username())) {
-            throw new DataAccessException("Username already Taken");
-        }
-        users.put(u.username(), u);
+        throw new UnsupportedOperationException("createUser not implemented yet");
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        UserData u = users.get(username);
-        if (u == null) throw new DataAccessException("User not found");
-        return u;
+        throw new UnsupportedOperationException("getUser not implemented yet");
     }
 
     @Override
     public GameData createGame(String gameName) {
-        int id = GameID++;
-        GameData g = new GameData(id, null, null, gameName, new ChessGame());
-        games.put(id, g);
-        return g;
+        throw new UnsupportedOperationException("createGame not implemented yet");
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        GameData g = games.get(gameID);
-        if (g == null) throw new DataAccessException("Game not found");
-        return g;
+        throw new UnsupportedOperationException("getGame not implemented yet");
     }
 
     @Override
     public List<GameData> listGames() {
-        return new ArrayList<>(games.values());
+        throw new UnsupportedOperationException("listGames not implemented yet");
     }
 
     @Override
     public void updateGame(GameData updated) throws DataAccessException {
-        if (!games.containsKey(updated.gameID())) {
-            throw new DataAccessException("Game not found");
-        }
-        games.put(updated.gameID(), updated);
+        throw new UnsupportedOperationException("updateGame not implemented yet");
     }
 
     @Override
     public AuthData createAuth(String username) {
-        String token = UUID.randomUUID().toString();
-        AuthData a = new AuthData(token, username);
-        auths.put(token, a);
-        return a;
+        throw new UnsupportedOperationException("createAuth not implemented yet");
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        AuthData a = auths.get(authToken);
-        if (a == null) throw new DataAccessException("Unauthorized");
-        return a;
+        throw new UnsupportedOperationException("getAuth not implemented yet");
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        if (auths.remove(authToken) == null) {
-            throw new DataAccessException("Unauthorized");
-        }
+        throw new UnsupportedOperationException("deleteAuth not implemented yet");
     }
 }
