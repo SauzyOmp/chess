@@ -74,4 +74,40 @@ public class DatabaseManager {
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
+
+    static public void initSchema() throws DataAccessException {
+        String createUsers =
+                "CREATE TABLE IF NOT EXISTS Users (" +
+                        "  id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                        "  username VARCHAR(50) NOT NULL UNIQUE," +
+                        "  password CHAR(60) NOT NULL," +
+                        "  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                        ")";
+
+        String createGames =
+                "CREATE TABLE IF NOT EXISTS Games (" +
+                        "  id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+                        "  owner VARCHAR(50) NOT NULL," +
+                        "  game_name VARCHAR(100) NOT NULL," +
+                        "  state_json TEXT NOT NULL," +
+                        "  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                        ")";
+
+        String createAuths =
+                "CREATE TABLE IF NOT EXISTS Auths (" +
+                        "  token CHAR(36) PRIMARY KEY," +
+                        "  username VARCHAR(50) NOT NULL," +
+                        "  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                        "  FOREIGN KEY (username) REFERENCES Users(username)" +
+                        ")";
+
+        try (var conn = getConnection();
+             var stmt = conn.createStatement()) {
+            stmt.executeUpdate(createUsers);
+            stmt.executeUpdate(createGames);
+            stmt.executeUpdate(createAuths);
+        } catch (SQLException e) {
+            throw new DataAccessException("failed to init schema", e);
+        }
+    }
 }
