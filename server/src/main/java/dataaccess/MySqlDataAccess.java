@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * MySQL-backed implementation of DataAccess.
- */
 public class MySqlDataAccess implements DataAccess {
 
     private static final Gson gson = new Gson();
@@ -22,7 +19,6 @@ public class MySqlDataAccess implements DataAccess {
     public void clear() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
-            // Delete in dependency order to avoid FK issues
             stmt.execute("DELETE FROM Auths");
             stmt.execute("DELETE FROM Games");
             stmt.execute("DELETE FROM Users");
