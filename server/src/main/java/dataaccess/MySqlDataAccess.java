@@ -29,7 +29,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData u) throws DataAccessException {
-        String sql = "INSERT INTO Users (username, password) VALUES (?, ?)";
+        String sql = "INSERT INTO Users (username, password, email) VALUES (?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.username());
@@ -43,7 +43,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        String sql = "SELECT username, password FROM Users WHERE username = ?";
+        String sql = "SELECT username, password, email FROM Users WHERE username = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
