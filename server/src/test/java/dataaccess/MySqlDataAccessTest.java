@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MySqlDataAccessTest {
     private DataAccess dao;
@@ -30,5 +31,18 @@ public class MySqlDataAccessTest {
         assertEquals("alice", fromDb.username());
         assertEquals("hashedPwd123", fromDb.password());
         assertEquals("alice@example.com", fromDb.email());
+    }
+
+    @Test
+    void createUser_duplicateUsername_throws() throws DataAccessException {
+        UserData u = new UserData("bob", "pw", "bob@ex.com");
+        dao.createUser(u);
+        assertThrows(DataAccessException.class, () -> dao.createUser(u),
+                "Inserting a user with duplicate username should fail");
+    }
+
+    @Test
+    void getUser_nonexistent_throws() {
+        assertThrows(DataAccessException.class, () -> dao.getUser("no_such_user"));
     }
 }
