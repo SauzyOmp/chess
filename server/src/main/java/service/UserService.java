@@ -5,6 +5,8 @@ import dataaccess.DataAccessException;
 import model.UserData;
 import model.AuthData;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class UserService {
     private final DataAccess dao;
 
@@ -33,7 +35,20 @@ public class UserService {
 
         UserData stored = dao.getUser(req.username());
 
-        if (!stored.password().equals(req.password())) {
+        String storedPassword = stored.password();
+        String providedPassword = req.password();
+        boolean isBCrypt = storedPassword != null && storedPassword.startsWith("$2");
+        boolean valid;
+        if (isBCrypt) {
+            try {
+                valid = BCrypt.checkpw(providedPassword, storedPassword);
+            } catch (IllegalArgumentException e) {
+                valid = false;
+            }
+        } else {
+            valid = storedPassword != null && storedPassword.equals(providedPassword);
+        }
+        if (!valid) {
             throw new DataAccessException("username/password incorrect");
         }
 

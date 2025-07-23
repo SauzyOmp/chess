@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.InMemoryDataAccess;
+import dataaccess.MySqlDataAccess;
 import service.CreateGameRequest;
 import service.CreateGameResult;
 import service.GameService;
@@ -22,9 +22,7 @@ import static spark.Spark.*;
 
 public class Server {
     private final Gson gson = new Gson();
-    private final DataAccess dao = new InMemoryDataAccess();
-    private final UserService userService = new UserService(dao);
-    private final GameService gameService = new GameService(dao);
+    private final DataAccess dao = new MySqlDataAccess();
 
     public int run(int desiredPort) {
         port(desiredPort);
@@ -49,14 +47,15 @@ public class Server {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: bad request"));
                 }
-                var result = userService.register(r);
+                var result = new UserService(dao).register(r);
                 res.status(200);
                 return gson.toJson(result);
             } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
-                if (e.getMessage().toLowerCase().contains("taken")) {
+                String msg = e.getMessage().toLowerCase();
+                if (msg.contains("taken")) {
                     res.status(403);
                 } else {
                     res.status(500);
@@ -72,27 +71,47 @@ public class Server {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: bad request"));
                 }
-                LoginResult result = userService.login(r);
+                LoginResult result = new UserService(dao).login(r);
                 res.status(200);
                 return gson.toJson(result);
             } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
-                res.status(401);
-                return gson.toJson(Map.of("message", "Error: unauthorized"));
+                String msg = e.getMessage();
+                if (msg != null) {
+                    String trimmed = msg.trim().toLowerCase();
+                    if (trimmed.equals("unauthorized") || trimmed.equals("user not found") || trimmed.equals("username/password incorrect")) {
+                        res.status(401);
+                    } else {
+                        res.status(500);
+                    }
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
 
         delete("/session", (req, res) -> {
             String token = req.headers("Authorization");
             try {
-                userService.logout(token);
+                new UserService(dao).logout(token);
                 res.status(200);
                 return "{}";
             } catch (DataAccessException e) {
-                res.status(401);
-                return gson.toJson(Map.of("message", "Error: unauthorized"));
+                String msg = e.getMessage();
+                if (msg != null) {
+                    String trimmed = msg.trim().toLowerCase();
+                    if (trimmed.equals("unauthorized") || trimmed.equals("user not found")) {
+                        res.status(401);
+                    } else {
+                        res.status(500);
+                    }
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
                 res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
@@ -102,12 +121,19 @@ public class Server {
         get("/game", (req, res) -> {
             try {
                 String token = req.headers("Authorization");
-                GamesResult games = gameService.listGames(token);
+                GamesResult games = new GameService(dao).listGames(token);
                 res.status(200);
                 return gson.toJson(games);
             } catch (DataAccessException e) {
-                res.status(401);
-                return gson.toJson(Map.of("message", "Error: unauthorized"));
+                String msg = e.getMessage();
+                if (msg != null && msg.trim().equalsIgnoreCase("unauthorized")) {
+                    res.status(401);
+                } else if (msg != null && msg.toLowerCase().contains("not found")) {
+                    res.status(400);
+                } else {
+                    res.status(500);
+                }
+                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
                 res.status(500);
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
@@ -122,17 +148,18 @@ public class Server {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: bad request"));
                 }
-                CreateGameResult result = gameService.createGame(token, r);
+                CreateGameResult result = new GameService(dao).createGame(token, r);
                 res.status(200);
                 return gson.toJson(result);
             } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
-                if (e.getMessage().toLowerCase().contains("unauthorized")) {
+                String msg = e.getMessage();
+                if (msg != null && msg.trim().equalsIgnoreCase("unauthorized")) {
                     res.status(401);
                 } else {
-                    res.status(400);
+                    res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
@@ -142,25 +169,27 @@ public class Server {
             try {
                 String token = req.headers("Authorization");
                 JoinGameRequest r = gson.fromJson(req.body(), JoinGameRequest.class);
-                if (r.playerColor() == null
-                        || !(r.playerColor().equals("WHITE") || r.playerColor().equals("BLACK"))) {
+                if (r.playerColor() == null ||
+                        !(r.playerColor().equals("WHITE") || r.playerColor().equals("BLACK"))) {
                     res.status(400);
                     return gson.toJson(Map.of("message", "Error: bad request"));
                 }
-                gameService.joinGame(token, r);
+                new GameService(dao).joinGame(token, r);
                 res.status(200);
                 return "{}";
             } catch (JsonSyntaxException e) {
                 res.status(400);
                 return gson.toJson(Map.of("message", "Error: bad request"));
             } catch (DataAccessException e) {
-                String msg = e.getMessage().toLowerCase();
-                if (msg.contains("unauthorized")) {
+                String msg = e.getMessage();
+                if (msg != null && msg.trim().equalsIgnoreCase("unauthorized")) {
                     res.status(401);
-                } else if (msg.contains("taken") || msg.contains("full")) {
+                } else if (msg != null && (msg.toLowerCase().contains("taken") || msg.toLowerCase().contains("full"))) {
                     res.status(403);
-                } else {
+                } else if (msg != null && msg.toLowerCase().contains("not found")) {
                     res.status(400);
+                } else {
+                    res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
@@ -176,5 +205,9 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    public static void main(String[] args) {
+        new Server().run(4567);
     }
 }

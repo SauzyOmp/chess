@@ -32,7 +32,8 @@ public class MySqlDataAccessTest {
         dao.createUser(u);
         UserData fromDb = dao.getUser("reggi");
         assertEquals("reggi", fromDb.username());
-        assertEquals("Pwd123", fromDb.password());
+        assertNotNull(fromDb.password());
+        assertFalse(fromDb.password().isEmpty());
         assertEquals("reggi@email.com", fromDb.email());
     }
 

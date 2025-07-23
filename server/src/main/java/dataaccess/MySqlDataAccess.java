@@ -6,6 +6,7 @@ import model.AuthData;
 import chess.ChessGame;
 import com.google.gson.Gson;
 
+import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,8 @@ public class MySqlDataAccess implements DataAccess {
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.username());
-            ps.setString(2, u.password());
+            String hashedPassword = BCrypt.hashpw(u.password(), BCrypt.gensalt());
+            ps.setString(2, hashedPassword);
             ps.setString(3, u.email());
             ps.executeUpdate();
         } catch (SQLException ex) {
@@ -67,11 +69,13 @@ public class MySqlDataAccess implements DataAccess {
     public GameData createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
         String stateJson = gson.toJson(game);
-        String sql = "INSERT INTO Games (game_name, state_json) VALUES (?, ?)";
+        String sql = "INSERT INTO Games (game_name, white_username, black_username, state_json) VALUES (?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, gameName);
-            ps.setString(2, stateJson);
+            ps.setNull(2, Types.VARCHAR);
+            ps.setNull(3, Types.VARCHAR);
+            ps.setString(4, stateJson);
             ps.executeUpdate();
             try (var rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -88,15 +92,17 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
-        String sql = "SELECT game_name, state_json FROM Games WHERE id = ?";
+        String sql = "SELECT game_name, white_username, black_username, state_json FROM Games WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setInt(1, gameID);
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String name = rs.getString("game_name");
+                    String white = rs.getString("white_username");
+                    String black = rs.getString("black_username");
                     ChessGame game = gson.fromJson(rs.getString("state_json"), ChessGame.class);
-                    return new GameData(gameID, null, null, name, game);
+                    return new GameData(gameID, white, black, name, game);
                 } else {
                     throw new DataAccessException("Game not found");
                 }
@@ -108,7 +114,7 @@ public class MySqlDataAccess implements DataAccess {
 
     @Override
     public List<GameData> listGames() throws DataAccessException {
-        String sql = "SELECT id, game_name, state_json FROM Games";
+        String sql = "SELECT id, game_name, white_username, black_username, state_json FROM Games";
         List<GameData> result = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql);
@@ -116,8 +122,10 @@ public class MySqlDataAccess implements DataAccess {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("game_name");
+                String white = rs.getString("white_username");
+                String black = rs.getString("black_username");
                 ChessGame game = gson.fromJson(rs.getString("state_json"), ChessGame.class);
-                result.add(new GameData(id, null, null, name, game));
+                result.add(new GameData(id, white, black, name, game));
             }
             return result;
         } catch (SQLException ex) {
@@ -129,11 +137,21 @@ public class MySqlDataAccess implements DataAccess {
     public void updateGame(GameData updated) throws DataAccessException {
         ChessGame game = updated.game();  // adjust if your getter differs
         String stateJson = gson.toJson(game);
-        String sql = "UPDATE Games SET state_json = ? WHERE id = ?";
+        String sql = "UPDATE Games SET white_username = ?, black_username = ?, state_json = ? WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
-            ps.setString(1, stateJson);
-            ps.setInt(2, updated.gameID());
+            if (updated.whiteUsername() != null) {
+                ps.setString(1, updated.whiteUsername());
+            } else {
+                ps.setNull(1, Types.VARCHAR);
+            }
+            if (updated.blackUsername() != null) {
+                ps.setString(2, updated.blackUsername());
+            } else {
+                ps.setNull(2, Types.VARCHAR);
+            }
+            ps.setString(3, stateJson);
+            ps.setInt(4, updated.gameID());
             int count = ps.executeUpdate();
             if (count == 0) {
                 throw new DataAccessException("Game not found for update");

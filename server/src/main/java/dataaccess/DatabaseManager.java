@@ -47,6 +47,8 @@ public class DatabaseManager {
                 "CREATE TABLE IF NOT EXISTS Games (" +
                         "  id BIGINT AUTO_INCREMENT PRIMARY KEY," +
                         "  game_name VARCHAR(100) NOT NULL," +
+                        "  white_username VARCHAR(50) NULL," +
+                        "  black_username VARCHAR(50) NULL," +
                         "  state_json TEXT NOT NULL," +
                         "  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
                         ")";
