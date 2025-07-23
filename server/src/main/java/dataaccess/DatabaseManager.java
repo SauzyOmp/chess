@@ -11,7 +11,6 @@ public class DatabaseManager {
     private static String databaseName;
     private static String dbUsername;
     private static String dbPassword;
-    private static String adminUrl;
     private static String connectionUrl;
 
     static {
@@ -23,7 +22,7 @@ public class DatabaseManager {
      */
     public static void createDatabase() throws DataAccessException {
         String sql = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-        try (var conn = DriverManager.getConnection(adminUrl, dbUsername, dbPassword);
+        try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var stmt = conn.prepareStatement(sql)) {
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -72,22 +71,24 @@ public class DatabaseManager {
 
     public static Connection getConnection() throws DataAccessException {
         try {
-            return DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+            var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
+            conn.setCatalog(databaseName);
+            return conn;
         } catch (SQLException ex) {
             throw new DataAccessException("failed to get connection", ex);
         }
     }
 
     private static void loadPropertiesFromResources() {
-        try (InputStream in = DatabaseManager.class
-                .getClassLoader()
-                .getResourceAsStream(PROPS_FILE)) {
-            if (in == null) throw new RuntimeException(PROPS_FILE + " not found");
+        try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
+            if (propStream == null) {
+                throw new Exception("Unable to load db.properties");
+            }
             Properties props = new Properties();
-            props.load(in);
+            props.load(propStream);
             loadProperties(props);
         } catch (Exception ex) {
-            throw new RuntimeException("unable to process " + PROPS_FILE, ex);
+            throw new RuntimeException("unable to process db.properties", ex);
         }
     }
 
@@ -95,17 +96,8 @@ public class DatabaseManager {
         databaseName = props.getProperty("db.name");
         dbUsername = props.getProperty("db.user");
         dbPassword = props.getProperty("db.password");
-        String host = props.getProperty("db.host", "localhost");
-        String port = props.getProperty("db.port", "3306");
-
-        adminUrl = String.format(
-                "jdbc:mysql://%s:%s/?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
-                host, port
-        );
-
-        connectionUrl = String.format(
-                "jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
-                host, port, databaseName
-        );
+        var host = props.getProperty("db.host");
+        var port = Integer.parseInt(props.getProperty("db.port"));
+        connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
 }
