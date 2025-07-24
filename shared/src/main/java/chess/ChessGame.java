@@ -165,7 +165,9 @@ public class ChessGame {
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (move == null) throw new InvalidMoveException("Move cannot be null");
+        if (move == null) {
+            throw new InvalidMoveException("Move cannot be null");
+        }
         ChessPosition from = move.getStartPosition();
         ChessPosition to = move.getEndPosition();
         ChessPiece piece = board.getPiece(from);

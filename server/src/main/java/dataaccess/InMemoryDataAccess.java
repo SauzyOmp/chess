@@ -49,7 +49,9 @@ public class InMemoryDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         GameData g = games.get(gameID);
-        if (g == null) throw new DataAccessException("Game not found");
+        if (g == null) {
+            throw new DataAccessException("Game not found");
+        }
         return g;
     }
 
