@@ -25,7 +25,6 @@ public class Server {
     private final Gson gson = new Gson();
     private final DataAccess dao = new MySqlDataAccess();
 
-    // Refactor the run method by moving endpoint setup and initialization into private helper methods to reduce method length.
 
     public int run(int desiredPort) {
         try {
@@ -40,6 +39,19 @@ public class Server {
         staticFiles.location("web");
         before((req, res) -> res.type("application/json"));
 
+        setupEndpoints();
+        awaitInitialization();
+        return port();
+    }
+
+    private void setupEndpoints() {
+        setupDbEndpoint();
+        setupUserEndpoint();
+        setupSessionEndpoints();
+        setupGameEndpoints();
+    }
+
+    private void setupDbEndpoint() {
         delete("/db", (req, res) -> {
             try {
                 dao.clear();
@@ -50,7 +62,9 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
+    }
 
+    private void setupUserEndpoint() {
         post("/user", (req, res) -> {
             try {
                 RegisterRequest r = gson.fromJson(req.body(), RegisterRequest.class);
@@ -74,7 +88,9 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
+    }
 
+    private void setupSessionEndpoints() {
         post("/session", (req, res) -> {
             try {
                 LoginRequest r = gson.fromJson(req.body(), LoginRequest.class);
@@ -128,7 +144,9 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
+    }
 
+    private void setupGameEndpoints() {
         get("/game", (req, res) -> {
             try {
                 String token = req.headers("Authorization");
@@ -208,9 +226,6 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             }
         });
-
-        awaitInitialization();
-        return port();
     }
 
     public void stop() {

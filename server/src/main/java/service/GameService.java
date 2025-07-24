@@ -49,8 +49,11 @@ public class GameService {
 
         String white = existing.whiteUsername();
         String black = existing.blackUsername();
-        if ("WHITE".equals(color)) white = auth.username();
-        else                          black = auth.username();
+        if ("WHITE".equals(color)) {
+            white = auth.username();
+        } else {
+            black = auth.username();
+        }
 
         GameData updated = new GameData(
                 existing.gameID(),
