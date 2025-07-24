@@ -27,7 +27,7 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void createUser_and_getUser_success() throws DataAccessException {
+    void createUserAndGetUserSuccess() throws DataAccessException {
         UserData u = new UserData("reggi", "Pwd123", "reggi@email.com");
         dao.createUser(u);
         UserData fromDb = dao.getUser("reggi");
@@ -38,7 +38,7 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void createUser_duplicateUsername_throws() throws DataAccessException {
+    void createUserDuplicateUsernameThrows() throws DataAccessException {
         UserData u = new UserData("bob", "pw", "bob@email.com");
         dao.createUser(u);
         assertThrows(DataAccessException.class, () -> dao.createUser(u),
@@ -46,12 +46,12 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void getUser_nonexistent_throws() {
+    void getUserNonexistentThrows() {
         assertThrows(DataAccessException.class, () -> dao.getUser("no_such_user"));
     }
 
     @Test
-    void createGame_and_getGame_success() throws DataAccessException {
+    void createGameAndGetGameSuccess() throws DataAccessException {
         GameData g = dao.createGame("chess-match");
         assertNotNull(g);
         assertTrue(g.gameID() > 0);
@@ -63,12 +63,12 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void getGame_nonexistent_throws() {
+    void getGameNonexistentThrows() {
         assertThrows(DataAccessException.class, () -> dao.getGame(99999));
     }
 
     @Test
-    void listGames_returnsAllGames() throws DataAccessException {
+    void listGamesReturnsAllGames() throws DataAccessException {
         dao.createGame("g1");
         dao.createGame("g2");
         List<GameData> games = dao.listGames();
@@ -78,26 +78,26 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void listGames_empty_returnsEmptyList() throws DataAccessException {
+    void listGamesEmptyReturnsEmptyList() throws DataAccessException {
         List<GameData> games = dao.listGames();
         assertTrue(games.isEmpty());
     }
 
     @Test
-    void updateGame_existingGame_succeeds() throws DataAccessException {
+    void updateGameExistingGameSucceeds() throws DataAccessException {
         GameData g = dao.createGame("initial");
         assertDoesNotThrow(() -> dao.updateGame(g));
     }
 
     @Test
-    void updateGame_nonexistentGame_throws() {
+    void updateGameNonexistentGameThrows() {
         GameData fake = new GameData(99999, null, null, "none", null);
         assertThrows(DataAccessException.class,
                 () -> dao.updateGame(fake));
     }
 
     @Test
-    void createAuth_and_getAuth_and_deleteAuth_success() throws DataAccessException {
+    void createAuthAndGetAuthAndDeleteAuthSuccess() throws DataAccessException {
         UserData u = new UserData("authuser", "pw", "user@email.com");
         dao.createUser(u);
 
@@ -116,13 +116,13 @@ public class MySqlDataAccessTest {
     }
 
     @Test
-    void getAuth_nonexistent_throws() {
+    void getAuthNonexistentThrows() {
         assertThrows(DataAccessException.class,
                 () -> dao.getAuth("no-such-token"));
     }
 
     @Test
-    void deleteAuth_nonexistent_throws() {
+    void deleteAuthNonexistentThrows() {
         assertThrows(DataAccessException.class,
                 () -> dao.deleteAuth("no-such-token"));
     }

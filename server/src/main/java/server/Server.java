@@ -25,6 +25,8 @@ public class Server {
     private final Gson gson = new Gson();
     private final DataAccess dao = new MySqlDataAccess();
 
+    // Refactor the run method by moving endpoint setup and initialization into private helper methods to reduce method length.
+
     public int run(int desiredPort) {
         try {
             DatabaseManager.createDatabase();

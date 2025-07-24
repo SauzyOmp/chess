@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTests {
 
     @Test
-    public void register_success() throws DataAccessException {
+    public void registerSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
         var req = new RegisterRequest("Reginald the 1st", "pass123", "reggie@realemail.com");
@@ -21,7 +21,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void register_duplicate() throws DataAccessException {
+    public void registerDuplicate() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
         var req = new RegisterRequest("bob the BUILDER", "pw", "bob@veryrealEmail.com");
@@ -35,7 +35,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void login_success() throws DataAccessException {
+    public void loginSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
         service.register(new RegisterRequest("Reginald the 2nd", "mypw", "reggieforeal@email.com"));
@@ -48,7 +48,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void login_badPassword() throws DataAccessException {
+    public void loginBadPassword() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
         service.register(new RegisterRequest("Reginald the 3rd", "secretysecret", "reggiedabomb@email.com"));
@@ -62,7 +62,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void logout_success() throws DataAccessException {
+    public void logoutSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
 
@@ -79,7 +79,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void logout_invalidToken() {
+    public void logoutInvalidToken() {
         var dao = new InMemoryDataAccess();
         var service = new UserService(dao);
 

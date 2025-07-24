@@ -11,14 +11,14 @@ public class InMemoryDataAccess implements DataAccess {
     private final Map<String, UserData> users = new HashMap<>();
     private final Map<Integer,GameData> games = new HashMap<>();
     private final Map<String,AuthData> auths = new HashMap<>();
-    private int GameID = 1;
+    private int gameId = 1;
 
     @Override
     public void clear() {
         users.clear();
         games.clear();
         auths.clear();
-        GameID = 1;
+        gameId = 1;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class InMemoryDataAccess implements DataAccess {
 
     @Override
     public GameData createGame(String gameName) {
-        int id = GameID++;
+        int id = gameId++;
         GameData g = new GameData(id, null, null, gameName, new ChessGame());
         games.put(id, g);
         return g;

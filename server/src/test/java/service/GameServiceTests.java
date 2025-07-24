@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTests {
 
     @Test
-    public void clear_success() throws DataAccessException {
+    public void clearSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);
@@ -30,7 +30,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void listGames_unauthorized() {
+    public void listGamesUnauthorized() {
         var dao = new InMemoryDataAccess();
         var gameService = new GameService(dao);
         DataAccessException ex = assertThrows(
@@ -41,7 +41,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void listGames_success() throws DataAccessException {
+    public void listGamesSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);
@@ -53,7 +53,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void createGame_unauthorized() {
+    public void createGameUnauthorized() {
         var dao = new InMemoryDataAccess();
         var gameService = new GameService(dao);
         DataAccessException ex = assertThrows(
@@ -64,7 +64,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void createGame_success() throws DataAccessException {
+    public void createGameSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);
@@ -74,7 +74,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGame_unauthorized() {
+    public void joinGameUnauthorized() {
         var dao = new InMemoryDataAccess();
         var gameService = new GameService(dao);
         DataAccessException ex = assertThrows(
@@ -85,7 +85,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGame_success() throws DataAccessException {
+    public void joinGameSuccess() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);
@@ -98,7 +98,7 @@ public class GameServiceTests {
     }
 
     @Test
-    public void joinGame_full() throws DataAccessException {
+    public void joinGameFull() throws DataAccessException {
         var dao = new InMemoryDataAccess();
         var userService = new UserService(dao);
         var gameService = new GameService(dao);

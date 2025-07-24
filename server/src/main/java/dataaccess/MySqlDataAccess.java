@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class MySqlDataAccess implements DataAccess {
 
-    private static final Gson gson = new Gson();
+    private static final Gson GSON = new Gson();
 
     @Override
     public void clear() throws DataAccessException {
@@ -68,7 +68,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
-        String stateJson = gson.toJson(game);
+        String stateJson = GSON.toJson(game);
         String sql = "INSERT INTO Games (game_name, white_username, black_username, state_json) VALUES (?, ?, ?, ?)";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -101,7 +101,7 @@ public class MySqlDataAccess implements DataAccess {
                     String name = rs.getString("game_name");
                     String white = rs.getString("white_username");
                     String black = rs.getString("black_username");
-                    ChessGame game = gson.fromJson(rs.getString("state_json"), ChessGame.class);
+                    ChessGame game = GSON.fromJson(rs.getString("state_json"), ChessGame.class);
                     return new GameData(gameID, white, black, name, game);
                 } else {
                     throw new DataAccessException("Game not found");
@@ -124,7 +124,7 @@ public class MySqlDataAccess implements DataAccess {
                 String name = rs.getString("game_name");
                 String white = rs.getString("white_username");
                 String black = rs.getString("black_username");
-                ChessGame game = gson.fromJson(rs.getString("state_json"), ChessGame.class);
+                ChessGame game = GSON.fromJson(rs.getString("state_json"), ChessGame.class);
                 result.add(new GameData(id, white, black, name, game));
             }
             return result;
@@ -136,7 +136,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public void updateGame(GameData updated) throws DataAccessException {
         ChessGame game = updated.game();  // adjust if your getter differs
-        String stateJson = gson.toJson(game);
+        String stateJson = GSON.toJson(game);
         String sql = "UPDATE Games SET white_username = ?, black_username = ?, state_json = ? WHERE id = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
