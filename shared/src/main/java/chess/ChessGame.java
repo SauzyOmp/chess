@@ -47,7 +47,15 @@ public class ChessGame {
 
     @Override
     public int hashCode() {
-        return Objects.hash(board, currentTurnColor, whiteKingMoved, blackKingMoved, whiteRookAMoved, whiteRookHMoved, blackRookAMoved, blackRookHMoved, lastMove);
+            return Objects.hash(board, 
+            currentTurnColor, 
+            whiteKingMoved, 
+            blackKingMoved, 
+            whiteRookAMoved, 
+            whiteRookHMoved, 
+            blackRookAMoved, 
+            blackRookHMoved, 
+            lastMove);
     }
 
     public ChessGame() {
