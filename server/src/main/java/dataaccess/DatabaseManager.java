@@ -1,13 +1,11 @@
 package dataaccess;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
 public class DatabaseManager {
-    private static final String PROPS_FILE = "db.properties";
     private static String databaseName;
     private static String dbUsername;
     private static String dbPassword;
@@ -18,7 +16,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Creates the database if it does not already exist, connecting via adminUrl.
+     * Creates the database if it does not already exist.
      */
     public static void createDatabase() throws DataAccessException {
         String sql = "CREATE DATABASE IF NOT EXISTS " + databaseName;
@@ -96,6 +94,7 @@ public class DatabaseManager {
         databaseName = props.getProperty("db.name");
         dbUsername = props.getProperty("db.user");
         dbPassword = props.getProperty("db.password");
+        
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);

@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.MySqlDataAccess;
+import dataaccess.DatabaseManager;
 import service.CreateGameRequest;
 import service.CreateGameResult;
 import service.GameService;
@@ -25,6 +26,14 @@ public class Server {
     private final DataAccess dao = new MySqlDataAccess();
 
     public int run(int desiredPort) {
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.initSchema();
+        } catch (Exception e) {
+            System.err.println("Failed to create database: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         port(desiredPort);
         staticFiles.location("web");
         before((req, res) -> res.type("application/json"));
