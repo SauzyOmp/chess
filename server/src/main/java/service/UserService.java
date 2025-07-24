@@ -19,7 +19,9 @@ public class UserService {
             dao.getUser(req.username());
             throw new DataAccessException("username already taken");
         } catch (DataAccessException e) {
-            if (!e.getMessage().contains("not found")) throw e;
+            if (!e.getMessage().contains("not found")) {
+                throw e;
+            }
         }
 
         UserData newUser = new UserData(req.username(), req.password(), req.email());

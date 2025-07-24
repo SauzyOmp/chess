@@ -26,7 +26,9 @@ public class ChessBoard {
     public ChessPiece getPiece(ChessPosition position) {
         int r = position.getRow() - 1;
         int c = position.getColumn() - 1;
-        if (r < 0 || r >= 8 || c < 0 || c >= 8) return null;
+        if (r < 0 || r >= 8 || c < 0 || c >= 8) {
+            return null;
+        }
         return board[r][c];
     }
 
@@ -85,9 +87,13 @@ public class ChessBoard {
                     }
                     sb.append(symbol);
                 }
-                if (col < 8) sb.append(' ');
+                if (col < 8) {
+                    sb.append(' ');
+                }
             }
-            if (row > 1) sb.append('\n');
+            if (row > 1) {
+                sb.append('\n');
+            }
         }
         return sb.toString();
     }

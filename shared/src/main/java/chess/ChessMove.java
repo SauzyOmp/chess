@@ -23,16 +23,20 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-    ChessMove that = (ChessMove) o;
+        ChessMove that = (ChessMove) o;
 
-    return startPosition.equals(that.startPosition) &&
-        endPosition.equals(that.endPosition) &&
-        ((promotionPiece == null && that.promotionPiece == null) || 
-        (promotionPiece != null && promotionPiece.equals(that.promotionPiece)));
-}
+        return startPosition.equals(that.startPosition) &&
+            endPosition.equals(that.endPosition) &&
+            ((promotionPiece == null && that.promotionPiece == null) || 
+            (promotionPiece != null && promotionPiece.equals(that.promotionPiece)));
+    }
 
     @Override
     public int hashCode() {

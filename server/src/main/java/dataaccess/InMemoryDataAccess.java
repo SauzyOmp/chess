@@ -32,7 +32,9 @@ public class InMemoryDataAccess implements DataAccess {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         UserData u = users.get(username);
-        if (u == null) throw new DataAccessException("User not found");
+        if (u == null) {
+            throw new DataAccessException("User not found");
+        }
         return u;
     }
 
