@@ -43,13 +43,26 @@ public class MoveCalculator {
                 if (occ == null) {
                     moves.add(new ChessMove(pos, to, null));
                 } else {
-                    if (occ.getTeamColor() != myColor) {
-                        moves.add(new ChessMove(pos, to, null));
-                    }
+                    if (occ.getTeamColor() != myColor) moves.add(new ChessMove(pos, to, null));
                     break;
                 }
-                r += d[0];
-                c += d[1];
+                r += d[0]; c += d[1];
+            }
+        }
+        return moves;
+    }
+
+    private static Collection<ChessMove> stepMoves(ChessPiece piece, ChessPosition pos, ChessBoard board,
+                                                   int[] rowOffsets, int[] colOffsets) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessGame.TeamColor myColor = piece.getTeamColor();
+        int r0 = pos.getRow(), c0 = pos.getColumn();
+        for (int i = 0; i < rowOffsets.length; i++) {
+            int r = r0 + rowOffsets[i], c = c0 + colOffsets[i];
+            if (isInBounds(r, c)) {
+                ChessPosition to = new ChessPosition(r, c);
+                ChessPiece occ = board.getPiece(to);
+                if (occ == null || occ.getTeamColor() != myColor) moves.add(new ChessMove(pos, to, null));
             }
         }
         return moves;
@@ -60,45 +73,19 @@ public class MoveCalculator {
     }
 
     private static Collection<ChessMove> calcKingMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        ChessGame.TeamColor pieceColor = piece.getTeamColor();
-        int currentRow = position.getRow(), currentCol = position.getColumn();
         int[] rowOffsets = { -1, -1, -1,  0, 0, 1, 1, 1 };
         int[] colOffsets = { -1,  0,  1, -1, 1, -1, 0, 1 };
-        for (int i = 0; i < 8; i++) {
-            int newRow = currentRow + rowOffsets[i], newCol = currentCol + colOffsets[i];
-            if (isInBounds(newRow, newCol)) {
-                ChessPosition to = new ChessPosition(newRow, newCol);
-                ChessPiece occ = board.getPiece(to);
-                if (occ == null || occ.getTeamColor() != pieceColor) {
-                    moves.add(new ChessMove(position, to, null));
-                }
-            }
-        }
-        return moves;
+        return stepMoves(piece, position, board, rowOffsets, colOffsets);
+    }
+
+    private static Collection<ChessMove> calcKnightMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
+        int[] rowOffsets = { -2, -1, 1, 2, 2, 1, -1, -2 };
+        int[] colOffsets = {  1,  2, 2, 1, -1, -2, -2, -1 };
+        return stepMoves(piece, position, board, rowOffsets, colOffsets);
     }
 
     private static Collection<ChessMove> calcBishopMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
         return slideMoves(piece, position, board, DIAGONALS);
-    }
-
-    private static Collection<ChessMove> calcKnightMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
-        Collection<ChessMove> moves = new ArrayList<>();
-        ChessGame.TeamColor pieceColor = piece.getTeamColor();
-        int currentRow = position.getRow(), currentCol = position.getColumn();
-        int[] rowOffsets = { -2, -1, 1, 2, 2, 1, -1, -2 };
-        int[] colOffsets = {  1,  2, 2, 1, -1, -2, -2, -1 };
-        for (int i = 0; i < 8; i++) {
-            int newRow = currentRow + rowOffsets[i], newCol = currentCol + colOffsets[i];
-            if (isInBounds(newRow, newCol)) {
-                ChessPosition to = new ChessPosition(newRow, newCol);
-                ChessPiece occ = board.getPiece(to);
-                if (occ == null || occ.getTeamColor() != pieceColor) {
-                    moves.add(new ChessMove(position, to, null));
-                }
-            }
-        }
-        return moves;
     }
 
     private static Collection<ChessMove> calcRookMoves(ChessPiece piece, ChessPosition position, ChessBoard board) {
@@ -128,9 +115,7 @@ public class MoveCalculator {
         int r1 = row + forward;
         if (isInBounds(r1, col) && board.getPiece(new ChessPosition(r1, col)) == null) {
             if (r1 == promoRow) {
-                for (ChessPiece.PieceType pt : promoTypes) {
-                    moves.add(new ChessMove(position, new ChessPosition(r1, col), pt));
-                }
+                for (ChessPiece.PieceType pt : promoTypes) moves.add(new ChessMove(position, new ChessPosition(r1, col), pt));
             } else {
                 moves.add(new ChessMove(position, new ChessPosition(r1, col), null));
                 int r2 = row + 2 * forward;
@@ -146,9 +131,7 @@ public class MoveCalculator {
             ChessPiece occ = board.getPiece(diag);
             if (occ != null && occ.getTeamColor() != color) {
                 if (r1 == promoRow) {
-                    for (ChessPiece.PieceType pt : promoTypes) {
-                        moves.add(new ChessMove(position, diag, pt));
-                    }
+                    for (ChessPiece.PieceType pt : promoTypes) moves.add(new ChessMove(position, diag, pt));
                 } else {
                     moves.add(new ChessMove(position, diag, null));
                 }
