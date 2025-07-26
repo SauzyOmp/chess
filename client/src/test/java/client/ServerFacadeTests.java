@@ -2,11 +2,13 @@ package client;
 
 import org.junit.jupiter.api.*;
 import server.Server;
+import service.RegisterResult;
 
 
 public class ServerFacadeTests {
-
     private static Server server;
+    private static ServerFacade facade;
+    private static int port;
 
     @BeforeAll
     public static void init() {
@@ -22,8 +24,11 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void registerPositive() throws Exception {
+        RegisterResult result = facade.register("user1", "pass1", "reggie1@example.com");
+        Assertions.assertNotNull(result.authToken());
+        Assertions.assertFalse(result.authToken().isEmpty());
+        Assertions.assertEquals("user1", result.username());
     }
 
 }
