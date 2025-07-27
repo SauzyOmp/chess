@@ -18,11 +18,20 @@ public class ResponseException extends Exception {
 
     public static ResponseException fromJson(InputStream body) {
         try {
-            Gson gson = new Gson();
-            ErrorResponse error = gson.fromJson(new InputStreamReader(body), ErrorResponse.class);
-            return new ResponseException(500, error.message());
+            // Read the entire content as string
+            String content = new String(body.readAllBytes());
+            
+            // Try to parse as JSON first
+            try {
+                Gson gson = new Gson();
+                ErrorResponse error = gson.fromJson(content, ErrorResponse.class);
+                return new ResponseException(500, error.message());
+            } catch (Exception jsonEx) {
+                // If JSON parsing fails, return the raw string content
+                return new ResponseException(500, content.trim());
+            }
         } catch (Exception e) {
-            return new ResponseException(500, "Unknown error");
+            return new ResponseException(500, "Unknown error: " + e.getMessage());
         }
     }
 } 
