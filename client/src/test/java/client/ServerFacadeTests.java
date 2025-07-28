@@ -24,6 +24,10 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    public void clearDatabase() throws Exception {
+        facade.clearDatabase();
+    }
 
     @Test
     public void registerPositive() throws Exception {
