@@ -21,10 +21,7 @@ public class PostLoginLoop {
                 } else if (input.equals("create game")) {
                     handleCreateGame(scanner, facade, authToken);
                 } else if (input.startsWith("play ") || input.startsWith("observe ")) {
-                    boolean success = handleJoinAndDraw(scanner, facade, authToken, input);
-                    if (success) {
-                        return;
-                    }
+                    handleJoinAndDraw(scanner, facade, authToken, input);
                 } else if (input.equals("logout")) {
                     facade.logout(authToken);
                     System.out.println("Logged out.");
@@ -68,11 +65,11 @@ public class PostLoginLoop {
         System.out.println("Created game '" + result.gameID() + "' (ID " + result.gameID() + ")");
     }
 
-    private boolean handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
+    private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
         String[] parts = input.split("\\s+");
         if (parts.length < 2) {
             System.out.println("Error: Please specify a game number. Use 'list games' to see available games.");
-            return false;
+            return;
         }
         
         try {
@@ -83,19 +80,14 @@ public class PostLoginLoop {
             if (choice < 0 || choice >= games.games().size()) {
                 System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
                 System.out.println("Available games: 1-" + games.games().size());
-                return false;
+                return;
             }
             
             GameData selected = games.games().get(choice);
             facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
             System.out.println("Joined game as " + role);
-            
-            // Render the board
-            BoardRenderer.renderBoard(selected.game());
-            return true;
         } catch (NumberFormatException e) {
             System.out.println("Error: Invalid game number. Please enter a number.");
-            return false;
         }
     }
 }

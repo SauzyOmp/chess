@@ -26,7 +26,7 @@ public class PreLoginLoop {
                     }
                     case "quit" -> {
                         System.out.println("Goodbye!");
-                        System.exit(0);
+                        return "QUIT";
                     }
                     default -> System.out.println("Unknown command. Type 'help' to see options.");
                 }

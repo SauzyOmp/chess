@@ -17,15 +17,19 @@ public class Main {
         ServerFacade facade = new ServerFacade(port);
         Scanner scanner = new Scanner(System.in);
 
-        String authToken = new PreLoginLoop().run(scanner, facade);
-
-        try {
-            new PostLoginLoop().run(scanner, facade, authToken);
-        } catch (Exception e) {
-            System.out.println("An error occurred: " + e.getMessage());
-            System.out.println("Please try again or contact support if the problem persists.");
+        while (true) {
+            try {
+                String authToken = new PreLoginLoop().run(scanner, facade);
+                if ("QUIT".equals(authToken)) {
+                    break;
+                }
+                new PostLoginLoop().run(scanner, facade, authToken);
+            } catch (Exception e) {
+                System.out.println("An error occurred: " + e.getMessage());
+                System.out.println("Please try again or contact support if the problem persists.");
+            }
         }
-
+        
         scanner.close();
     }
 }

@@ -90,7 +90,6 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws java.io.IOException, ResponseException {
         int status = http.getResponseCode();
-        System.out.println("HTTP Status: " + status);
         if (status / 100 != 2) {
             try (InputStream err = http.getErrorStream()) {
                 if (err != null) {
