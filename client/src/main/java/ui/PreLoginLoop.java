@@ -19,15 +19,11 @@ public class PreLoginLoop {
                     case "help", "h" -> printHelp();
                     case "register", "r" -> {
                         AuthData result = handleRegister(scanner, facade);
-                        if (result != null) {
-                            return result;
-                        }
+                        return result;
                     }
                     case "login", "l" -> {
                         AuthData result = handleLogin(scanner, facade);
-                        if (result != null) {
-                            return result;
-                        }
+                        return result;
                     }
                     case "quit", "q" -> {
                         System.out.println("Goodbye!");
