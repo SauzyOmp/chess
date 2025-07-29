@@ -25,7 +25,6 @@ public class Server {
     private final Gson gson = new Gson();
     private final DataAccess dao = new MySqlDataAccess();
 
-
     public int run(int desiredPort) {
         try {
             DatabaseManager.createDatabase();
@@ -234,6 +233,13 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        new Server().run(4567);
+        int port = 8080;
+        if (args.length > 0) {
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        new Server().run(port);
     }
 }

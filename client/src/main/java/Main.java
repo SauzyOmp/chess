@@ -1,6 +1,7 @@
 import java.util.Scanner;
 import client.ServerFacade;
 import ui.PreLoginLoop;
+import ui.PostLoginLoop;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,6 +17,9 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         String authToken = new PreLoginLoop().run(scanner, facade);
+
+        // Run Post-login loop: handles listing, creating, joining games
+        new PostLoginLoop().run(scanner, facade, authToken);
 
         scanner.close();
     }
