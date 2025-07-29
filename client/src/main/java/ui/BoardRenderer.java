@@ -13,22 +13,25 @@ public class BoardRenderer {
     public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective) {
         ChessBoard board = game.getBoard();
         
-        // Print column headers
+        // Determine if we need to flip the board
+        boolean flipBoard = (perspective == ChessGame.TeamColor.WHITE);
+        
         System.out.print("   ");
         for (int col = 1; col <= 8; col++) {
-            System.out.print(" " + (char)('a' + col - 1) + " ");
+            char colChar = flipBoard ? (char)('h' - col + 1) : (char)('a' + col - 1);
+            System.out.print(" " + colChar + " ");
         }
         System.out.println();
         
-        // Print board rows
-        for (int row = 8; row >= 1; row--) {
-            System.out.print(" " + row + " ");
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition position = new ChessPosition(row, col);
+        for (int displayRow = 1; displayRow <= 8; displayRow++) {
+            int actualRow = flipBoard ? displayRow : (9 - displayRow);
+            System.out.print(" " + displayRow + " ");
+            for (int displayCol = 1; displayCol <= 8; displayCol++) {
+                int actualCol = flipBoard ? (9 - displayCol) : displayCol;
+                ChessPosition position = new ChessPosition(actualRow, actualCol);
                 ChessPiece piece = board.getPiece(position);
                 
-                // Alternate background colors for checkered pattern
-                boolean isLightSquare = (row + col) % 2 == 0;
+                boolean isLightSquare = (displayRow + displayCol) % 2 == 0;
                 String bgColor = isLightSquare ? EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_DARK_GREY;
                 
                 if (piece == null) {
@@ -38,17 +41,16 @@ public class BoardRenderer {
                     System.out.print(bgColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
                 }
             }
-            System.out.println(" " + row);
+            System.out.println(" " + displayRow);
         }
         
-        // Print column headers again
         System.out.print("   ");
         for (int col = 1; col <= 8; col++) {
-            System.out.print(" " + (char)('a' + col - 1) + " ");
+            char colChar = flipBoard ? (char)('h' - col + 1) : (char)('a' + col - 1);
+            System.out.print(" " + colChar + " ");
         }
         System.out.println();
         
-        // Print current turn
         System.out.println("Current turn: " + game.getTeamTurn());
     }
     
