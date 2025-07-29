@@ -1,10 +1,11 @@
 package ui;
 
-import java.util.Scanner;
-import exception.ResponseException;
 import client.ServerFacade;
+import exception.ResponseException;
 import service.LoginResult;
 import service.RegisterResult;
+
+import java.util.Scanner;
 
 public class PreLoginLoop {
     public String run(Scanner scanner, ServerFacade facade) {

@@ -85,6 +85,9 @@ public class Server {
                     res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
     }
@@ -116,6 +119,9 @@ public class Server {
                     res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
 
@@ -140,7 +146,7 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
                 res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
     }
@@ -164,7 +170,7 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
                 res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
 
@@ -190,6 +196,9 @@ public class Server {
                     res.status(500);
                 }
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+            } catch (Exception e) {
+                res.status(500);
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
 
@@ -222,7 +231,7 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
             } catch (Exception e) {
                 res.status(500);
-                return gson.toJson(Map.of("message", "Error: " + e.getMessage()));
+                return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
     }

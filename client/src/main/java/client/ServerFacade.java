@@ -2,14 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import service.RegisterRequest;
-import service.RegisterResult;
-import service.LoginRequest;
-import service.LoginResult;
-import service.CreateGameRequest;
-import service.CreateGameResult;
-import service.JoinGameRequest;
-import service.GamesResult;
+import service.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

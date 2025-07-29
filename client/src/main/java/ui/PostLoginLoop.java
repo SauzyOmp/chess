@@ -1,11 +1,12 @@
 package ui;
 
-import java.util.Scanner;
-import exception.ResponseException;
 import client.ServerFacade;
-import service.GamesResult;
-import service.CreateGameResult;
+import exception.ResponseException;
 import model.GameData;
+import service.CreateGameResult;
+import service.GamesResult;
+
+import java.util.Scanner;
 
 public class PostLoginLoop {
     public void run(Scanner scanner, ServerFacade facade, String authToken) {
@@ -20,8 +21,10 @@ public class PostLoginLoop {
                 } else if (input.equals("create game")) {
                     handleCreateGame(scanner, facade, authToken);
                 } else if (input.startsWith("play ") || input.startsWith("observe ")) {
-                    handleJoinAndDraw(scanner, facade, authToken, input);
-                    return;
+                    boolean success = handleJoinAndDraw(scanner, facade, authToken, input);
+                    if (success) {
+                        return;
+                    }
                 } else if (input.equals("logout")) {
                     facade.logout(authToken);
                     System.out.println("Logged out.");
@@ -36,7 +39,13 @@ public class PostLoginLoop {
     }
 
     private void printHelp() {
-        System.out.println("Available commands: help, list games, create game, play <num> <WHITE|BLACK>, observe <num>, logout");
+        System.out.println("Available commands:");
+        System.out.println("  help - Show this help message");
+        System.out.println("  list games - Show all available games");
+        System.out.println("  create game - Create a new game");
+        System.out.println("  play <number> <WHITE|BLACK> - Join a game as a player (use number from 'list games')");
+        System.out.println("  observe <number> - Join a game as an observer (use number from 'list games')");
+        System.out.println("  logout - Log out and return to main menu");
     }
 
     private void handleListGames(ServerFacade facade, String authToken) throws ResponseException {
@@ -59,16 +68,34 @@ public class PostLoginLoop {
         System.out.println("Created game '" + result.gameID() + "' (ID " + result.gameID() + ")");
     }
 
-    private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
+    private boolean handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
         String[] parts = input.split("\\s+");
-        int choice = Integer.parseInt(parts[1]) - 1;
-        String role = parts[0].equals("observe") ? "WHITE" : (parts.length >= 3 ? parts[2].toUpperCase() : "WHITE");
-        GamesResult games = facade.listGames(authToken);
-        GameData selected = games.games().get(choice);
-        facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
-        System.out.println("Joined game as " + role);
+        if (parts.length < 2) {
+            System.out.println("Error: Please specify a game number. Use 'list games' to see available games.");
+            return false;
+        }
         
-        // Render the board
-        BoardRenderer.renderBoard(selected.game());
+        try {
+            int choice = Integer.parseInt(parts[1]) - 1;
+            String role = parts[0].equals("observe") ? "WHITE" : (parts.length >= 3 ? parts[2].toUpperCase() : "WHITE");
+            GamesResult games = facade.listGames(authToken);
+            
+            if (choice < 0 || choice >= games.games().size()) {
+                System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
+                System.out.println("Available games: 1-" + games.games().size());
+                return false;
+            }
+            
+            GameData selected = games.games().get(choice);
+            facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
+            System.out.println("Joined game as " + role);
+            
+            // Render the board
+            BoardRenderer.renderBoard(selected.game());
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Invalid game number. Please enter a number.");
+            return false;
+        }
     }
 }

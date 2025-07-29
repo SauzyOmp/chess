@@ -1,7 +1,8 @@
-import java.util.Scanner;
 import client.ServerFacade;
-import ui.PreLoginLoop;
 import ui.PostLoginLoop;
+import ui.PreLoginLoop;
+
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,8 +19,12 @@ public class Main {
 
         String authToken = new PreLoginLoop().run(scanner, facade);
 
-        // Run Post-login loop: handles listing, creating, joining games
-        new PostLoginLoop().run(scanner, facade, authToken);
+        try {
+            new PostLoginLoop().run(scanner, facade, authToken);
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+            System.out.println("Please try again or contact support if the problem persists.");
+        }
 
         scanner.close();
     }
