@@ -81,10 +81,14 @@ public class PostLoginLoop {
         System.out.print("Game name: ");
         String name = scanner.nextLine().trim();
         GameResult result = facade.createGame(authToken, name);
+        
+        GamesResult games = facade.listGames(authToken);
+        int gamePosition = games.games().size();
+        
         System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Created game '" + name + "' (ID " + 
             result.gameID() + ")" + EscapeSequences.RESET_TEXT_COLOR);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Use command " + 
-            EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + result.gameID() + 
+            EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + gamePosition + 
             EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
     }
 
@@ -118,23 +122,23 @@ public class PostLoginLoop {
                 // Ask for color choice
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
                     "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "1) " + 
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "w) " + 
                     EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING + " White");
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "2) " + 
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "b) " + 
                     EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING + " Black");
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter choice (1 or 2): " + 
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter choice (w or b): " + 
                     EscapeSequences.RESET_TEXT_COLOR);
                 
-                String colorChoice = scanner.nextLine().trim();
-                if (colorChoice.equals("1")) {
+                String colorChoice = scanner.nextLine().trim().toLowerCase();
+                if (colorChoice.equals("w")) {
                     role = "WHITE";
                     perspective = ChessGame.TeamColor.WHITE;
-                } else if (colorChoice.equals("2")) {
+                } else if (colorChoice.equals("b")) {
                     role = "BLACK";
                     perspective = ChessGame.TeamColor.BLACK;
                 } else {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
-                        "Invalid choice. Please enter 1 for White or 2 for Black." + EscapeSequences.RESET_TEXT_COLOR);
+                        "Invalid choice. Please enter w for White or b for Black." + EscapeSequences.RESET_TEXT_COLOR);
                     return;
                 }
             }
