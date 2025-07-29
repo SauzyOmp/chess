@@ -115,11 +115,12 @@ public class PostLoginLoop {
             ChessGame.TeamColor perspective;
             
             if (isObserving) {
-                role = "WHITE"; // Default for observers
-                perspective = null; // Show board normally for observers
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Joining as observer..." + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Observing game..." + EscapeSequences.RESET_TEXT_COLOR);
+                
+                BoardRenderer.renderBoard(selected.game(), null);
+                
+                return;
             } else {
-                // Ask for color choice
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
                     "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "w) " + 
@@ -144,11 +145,10 @@ public class PostLoginLoop {
             }
             
             facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
-            String commandUsed = isObserving ? "observe " + (choice + 1) : "play " + (choice + 1);
+            String commandUsed = "play " + (choice + 1);
             System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
                 " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
             
-            // Render the board with the correct perspective
             BoardRenderer.renderBoard(selected.game(), perspective);
             
         } catch (NumberFormatException e) {
