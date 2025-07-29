@@ -1,7 +1,7 @@
 import client.ServerFacade;
 import ui.PostLoginLoop;
 import ui.PreLoginLoop;
-import service.LoginResult;
+import model.AuthData;
 import ui.EscapeSequences;
 
 import java.util.Scanner;
@@ -33,7 +33,7 @@ public class Main {
 
         while (true) {
             try {
-                LoginResult loginResult = new PreLoginLoop().run(scanner, facade);
+                AuthData loginResult = new PreLoginLoop().run(scanner, facade);
                 new PostLoginLoop().run(scanner, facade, loginResult.authToken(), loginResult.username());
             } catch (Exception e) {
                 System.out.println("An error occurred: " + e.getMessage());

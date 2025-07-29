@@ -2,7 +2,9 @@ package client;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import service.*;
+import model.UserData;
+import model.AuthData;
+import model.GameData;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,14 +29,14 @@ public class ServerFacade {
         makeRequest("DELETE", "/db", null, null, null);
     }
 
-    public RegisterResult register(String username, String password, String email) throws ResponseException {
-        RegisterRequest req = new RegisterRequest(username, password, email);
-        return makeRequest("POST", "/user", req, RegisterResult.class, null);
+    public AuthData register(String username, String password, String email) throws ResponseException {
+        UserData req = new UserData(username, password, email);
+        return makeRequest("POST", "/user", req, AuthData.class, null);
     }
 
-    public LoginResult login(String username, String password) throws ResponseException {
-        LoginRequest req = new LoginRequest(username, password);
-        return makeRequest("POST", "/session", req, LoginResult.class, null);
+    public AuthData login(String username, String password) throws ResponseException {
+        UserData req = new UserData(username, password, null);
+        return makeRequest("POST", "/session", req, AuthData.class, null);
     }
 
     public void logout(String authToken) throws ResponseException {
@@ -45,13 +47,13 @@ public class ServerFacade {
         return makeRequest("GET", "/game", null, GamesResult.class, authToken);
     }
 
-    public CreateGameResult createGame(String authToken, String gameName) throws ResponseException {
-        CreateGameRequest req = new CreateGameRequest(gameName);
-        return makeRequest("POST", "/game", req, CreateGameResult.class, authToken);
+    public GameResult createGame(String authToken, String gameName) throws ResponseException {
+        GameRequest req = new GameRequest(gameName);
+        return makeRequest("POST", "/game", req, GameResult.class, authToken);
     }
 
     public void joinGame(String authToken, String gameId, String playerColor) throws ResponseException {
-        JoinGameRequest req = new JoinGameRequest(Integer.parseInt(gameId), playerColor);
+        JoinRequest req = new JoinRequest(Integer.parseInt(gameId), playerColor);
         makeRequest("PUT", "/game", req, null, authToken);
     }
 

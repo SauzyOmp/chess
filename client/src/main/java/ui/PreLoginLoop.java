@@ -2,14 +2,13 @@ package ui;
 
 import client.ServerFacade;
 import exception.ResponseException;
-import service.LoginResult;
-import service.RegisterResult;
+import model.AuthData;
 import ui.EscapeSequences;
 
 import java.util.Scanner;
 
 public class PreLoginLoop {
-    public LoginResult run(Scanner scanner, ServerFacade facade) {
+    public AuthData run(Scanner scanner, ServerFacade facade) {
         String authToken = null;
         String username = null;
         while (true) {
@@ -19,11 +18,11 @@ public class PreLoginLoop {
                 switch (input) {
                     case "help", "h" -> printHelp();
                     case "register", "r" -> {
-                        LoginResult result = handleRegister(scanner, facade);
+                        AuthData result = handleRegister(scanner, facade);
                         if (result != null) return result;
                     }
                     case "login", "l" -> {
-                        LoginResult result = handleLogin(scanner, facade);
+                        AuthData result = handleLogin(scanner, facade);
                         if (result != null) return result;
                     }
                     case "quit", "q" -> {
@@ -46,25 +45,25 @@ public class PreLoginLoop {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_RED + "quit" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (q)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Exit the program");
     }
 
-    private LoginResult handleRegister(Scanner scanner, ServerFacade facade) throws ResponseException {
+    private AuthData handleRegister(Scanner scanner, ServerFacade facade) throws ResponseException {
         System.out.print("Username: ");
         String username = scanner.nextLine().trim();
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
         System.out.print("Email: ");
         String email = scanner.nextLine().trim();
-        RegisterResult result = facade.register(username, password, email);
+        AuthData result = facade.register(username, password, email);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Registered and logged in as " + result.username() + EscapeSequences.RESET_TEXT_COLOR);
-        return new LoginResult(result.username(), result.authToken());
+        return result;
     }
 
-    private LoginResult handleLogin(Scanner scanner, ServerFacade facade) throws ResponseException {
+    private AuthData handleLogin(Scanner scanner, ServerFacade facade) throws ResponseException {
         System.out.print("Username: ");
         String username = scanner.nextLine().trim();
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
-        LoginResult result = facade.login(username, password);
+        AuthData result = facade.login(username, password);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Logged in as " + result.username() + EscapeSequences.RESET_TEXT_COLOR);
-        return new LoginResult(result.username(), result.authToken());
+        return result;
     }
 }

@@ -3,8 +3,8 @@ package ui;
 import client.ServerFacade;
 import exception.ResponseException;
 import model.GameData;
-import service.CreateGameResult;
-import service.GamesResult;
+import client.GameResult;
+import client.GamesResult;
 import chess.ChessGame;
 import ui.EscapeSequences;
 
@@ -48,12 +48,12 @@ public class PostLoginLoop {
     }
 
     private void handleListGames(ServerFacade facade, String authToken) throws ResponseException {
-        GamesResult games = facade.listGames(authToken);
-        if (games.games().isEmpty()) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No games available." + EscapeSequences.RESET_TEXT_COLOR);
-        } else {
-            int index = 1;
-            for (GameData g : games.games()) {
+                    GamesResult games = facade.listGames(authToken);
+            if (games.games().isEmpty()) {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No games available." + EscapeSequences.RESET_TEXT_COLOR);
+            } else {
+                int index = 1;
+                for (GameData g : games.games()) {
                 System.out.printf(EscapeSequences.SET_TEXT_COLOR_GREEN + "%d" + EscapeSequences.SET_TEXT_COLOR_WHITE + ") " + 
                     EscapeSequences.SET_TEXT_COLOR_BLUE + "%s" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - " + 
                     EscapeSequences.SET_TEXT_COLOR_YELLOW + "white: %s" + EscapeSequences.SET_TEXT_COLOR_WHITE + ", " + 
@@ -66,7 +66,7 @@ public class PostLoginLoop {
     private void handleCreateGame(Scanner scanner, ServerFacade facade, String authToken) throws ResponseException {
         System.out.print("Game name: ");
         String name = scanner.nextLine().trim();
-        CreateGameResult result = facade.createGame(authToken, name);
+        GameResult result = facade.createGame(authToken, name);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Created game '" + name + "' (ID " + result.gameID() + ")" + EscapeSequences.RESET_TEXT_COLOR);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Use command " + EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + result.gameID() + EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
     }
@@ -81,15 +81,15 @@ public class PostLoginLoop {
         try {
             int choice = Integer.parseInt(parts[1]) - 1;
             boolean isObserving = parts[0].equals("observe") || parts[0].equals("o");
-            GamesResult games = facade.listGames(authToken);
-            
-            if (choice < 0 || choice >= games.games().size()) {
-                System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
-                System.out.println("Available games: 1-" + games.games().size());
-                return;
-            }
-            
-            GameData selected = games.games().get(choice);
+                                GamesResult games = facade.listGames(authToken);
+
+                    if (choice < 0 || choice >= games.games().size()) {
+                        System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
+                        System.out.println("Available games: 1-" + games.games().size());
+                        return;
+                    }
+
+                    GameData selected = games.games().get(choice);
             String role;
             ChessGame.TeamColor perspective;
             
