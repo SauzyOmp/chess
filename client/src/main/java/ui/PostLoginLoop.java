@@ -29,7 +29,8 @@ public class PostLoginLoop {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Logged out." + EscapeSequences.RESET_TEXT_COLOR);
                     return;
                 } else {
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Unknown command. Type 'help' to see options." + EscapeSequences.RESET_TEXT_COLOR);
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                        "Unknown command. Type 'help' to see options." + EscapeSequences.RESET_TEXT_COLOR);
                 }
             } catch (ResponseException e) {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: " + e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
@@ -38,13 +39,26 @@ public class PostLoginLoop {
     }
 
     private void printHelp() {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + "Available commands:" + EscapeSequences.RESET_TEXT_COLOR);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (h)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Show this help message");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + "list games" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (lg)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Show all available games");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + "create game" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (cg)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Create a new game");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + "play <number>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (p)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Join a game as a player (you'll choose color)");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + "observe <number>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (o)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Join a game as an observer");
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_RED + "logout" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (lo)" + EscapeSequences.SET_TEXT_COLOR_WHITE + " - Log out and return to main menu");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
+            "Available commands:" + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+            "help" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (h)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Show this help message");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+            "list games" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (lg)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Show all available games");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+            "create game" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (cg)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Create a new game");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+            "play <number>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (p)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Join a game as a player (you'll choose color)");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+            "observe <number>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (o)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Join a game as an observer");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_RED + 
+            "logout" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (lo)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Log out and return to main menu");
     }
 
     private void handleListGames(ServerFacade facade, String authToken) throws ResponseException {
@@ -67,8 +81,11 @@ public class PostLoginLoop {
         System.out.print("Game name: ");
         String name = scanner.nextLine().trim();
         GameResult result = facade.createGame(authToken, name);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Created game '" + name + "' (ID " + result.gameID() + ")" + EscapeSequences.RESET_TEXT_COLOR);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Use command " + EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + result.gameID() + EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Created game '" + name + "' (ID " + 
+            result.gameID() + ")" + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Use command " + 
+            EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + result.gameID() + 
+            EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
@@ -99,10 +116,14 @@ public class PostLoginLoop {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Joining as observer..." + EscapeSequences.RESET_TEXT_COLOR);
             } else {
                 // Ask for color choice
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "1) " + EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING + " White");
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "2) " + EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING + " Black");
-                System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter choice (1 or 2): " + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
+                    "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "1) " + 
+                    EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING + " White");
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "2) " + 
+                    EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING + " Black");
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter choice (1 or 2): " + 
+                    EscapeSequences.RESET_TEXT_COLOR);
                 
                 String colorChoice = scanner.nextLine().trim();
                 if (colorChoice.equals("1")) {
@@ -112,20 +133,23 @@ public class PostLoginLoop {
                     role = "BLACK";
                     perspective = ChessGame.TeamColor.BLACK;
                 } else {
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid choice. Please enter 1 for White or 2 for Black." + EscapeSequences.RESET_TEXT_COLOR);
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                        "Invalid choice. Please enter 1 for White or 2 for Black." + EscapeSequences.RESET_TEXT_COLOR);
                     return;
                 }
             }
             
             facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
             String commandUsed = isObserving ? "observe " + (choice + 1) : "play " + (choice + 1);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
+                " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
             
             // Render the board with the correct perspective
             BoardRenderer.renderBoard(selected.game(), perspective);
             
         } catch (NumberFormatException e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error: Invalid game number. Please enter a number." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "Error: Invalid game number. Please enter a number." + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 }
