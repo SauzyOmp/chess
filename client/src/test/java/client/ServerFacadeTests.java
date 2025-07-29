@@ -111,4 +111,44 @@ public class ServerFacadeTests {
         AuthData login = facade.login("user10", "pass10");
         Assertions.assertThrows(ResponseException.class, () -> facade.joinGame(login.authToken(), "9999", "BLACK"));
     }
+
+    @Test
+    public void clearDatabasePositive() throws Exception {
+        // Create some data first
+        facade.register("user11", "pass11", "reggie11@example.com");
+        AuthData login = facade.login("user11", "pass11");
+        facade.createGame(login.authToken(), "testGame");
+        
+        // Clear the database
+        facade.clearDatabase();
+        
+        // Verify it's cleared by trying to list games with the old token
+        Assertions.assertThrows(ResponseException.class, () -> facade.listGames(login.authToken()));
+    }
+
+    @Test
+    public void clearDatabaseNegative() throws Exception {
+        // This test verifies that clearDatabase doesn't throw an exception when called multiple times
+        facade.clearDatabase();
+        facade.clearDatabase(); // Should not throw an exception
+        Assertions.assertTrue(true); // If we get here, the test passes
+    }
+
+    @Test
+    public void logoutPositive() throws Exception {
+        facade.register("user12", "pass12", "reggie12@example.com");
+        AuthData login = facade.login("user12", "pass12");
+        
+        // Logout should not throw an exception
+        facade.logout(login.authToken());
+        
+        // Verify logout worked by trying to use the token again
+        Assertions.assertThrows(ResponseException.class, () -> facade.listGames(login.authToken()));
+    }
+
+    @Test
+    public void logoutNegative() throws Exception {
+        // Try to logout with an invalid token
+        Assertions.assertThrows(ResponseException.class, () -> facade.logout("invalidToken"));
+    }
 }

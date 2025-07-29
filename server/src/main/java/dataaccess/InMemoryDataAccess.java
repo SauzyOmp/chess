@@ -79,7 +79,9 @@ public class InMemoryDataAccess implements DataAccess {
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         AuthData a = auths.get(authToken);
-        if (a == null) throw new DataAccessException("Unauthorized");
+        if (a == null) {
+            throw new DataAccessException("Unauthorized");
+        }
         return a;
     }
 

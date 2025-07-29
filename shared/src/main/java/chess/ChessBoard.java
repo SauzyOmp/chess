@@ -34,8 +34,12 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessBoard)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChessBoard)) {
+            return false;
+        }
         ChessBoard other = (ChessBoard) o;
 
         for (int row = 1; row <= 8; row++) {
