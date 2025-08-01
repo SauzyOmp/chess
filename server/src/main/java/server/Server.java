@@ -16,6 +16,7 @@ import service.LoginResult;
 import service.RegisterRequest;
 import service.UserService;
 import spark.Spark;
+import server.websocket.WebSocketHandler;
 
 import java.util.Map;
 
@@ -48,6 +49,7 @@ public class Server {
         setupUserEndpoint();
         setupSessionEndpoints();
         setupGameEndpoints();
+        setupWebSocket();
     }
 
     private void setupDbEndpoint() {
@@ -234,6 +236,10 @@ public class Server {
                 return gson.toJson(Map.of("message", "Error: Internal server error"));
             }
         });
+    }
+
+    private void setupWebSocket() {
+        webSocket("/ws", new WebSocketHandler(dao));
     }
 
     public void stop() {
