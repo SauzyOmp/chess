@@ -102,24 +102,20 @@ public class PostLoginLoop {
         try {
             int choice = Integer.parseInt(parts[1]) - 1;
             boolean isObserving = parts[0].equals("observe") || parts[0].equals("o");
-                                GamesResult games = facade.listGames(authToken);
+            GamesResult games = facade.listGames(authToken);
 
-                    if (choice < 0 || choice >= games.games().size()) {
-                        System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
-                        System.out.println("Available games: 1-" + games.games().size());
-                        return;
-                    }
+            if (choice < 0 || choice >= games.games().size()) {
+                System.out.println("Error: Invalid game number. Use 'list games' to see available games.");
+                System.out.println("Available games: 1-" + games.games().size());
+                return;
+            }
 
-                    GameData selected = games.games().get(choice);
-            String role;
-            ChessGame.TeamColor perspective;
+            GameData selected = games.games().get(choice);
+            String role = null;
+            ChessGame.TeamColor playerColor = null;
             
             if (isObserving) {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Observing game..." + EscapeSequences.RESET_TEXT_COLOR);
-                
-                BoardRenderer.renderBoard(selected.game(), null);
-                
-                return;
             } else {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
                     "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
@@ -133,27 +129,32 @@ public class PostLoginLoop {
                 String colorChoice = scanner.nextLine().trim().toLowerCase();
                 if (colorChoice.equals("w")) {
                     role = "WHITE";
-                    perspective = ChessGame.TeamColor.WHITE;
+                    playerColor = ChessGame.TeamColor.WHITE;
                 } else if (colorChoice.equals("b")) {
                     role = "BLACK";
-                    perspective = ChessGame.TeamColor.BLACK;
+                    playerColor = ChessGame.TeamColor.BLACK;
                 } else {
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
                         "Invalid choice. Please enter w for White or b for Black." + EscapeSequences.RESET_TEXT_COLOR);
                     return;
                 }
+                
+                facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
+                String commandUsed = "play " + (choice + 1);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
+                    " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
             }
             
-            facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
-            String commandUsed = "play " + (choice + 1);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
-                " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
-            
-            BoardRenderer.renderBoard(selected.game(), perspective);
+            String serverUrl = "http://localhost:8080";
+            GameplayUI gameplayUI = new GameplayUI(authToken, selected.gameID(), username, playerColor, serverUrl);
+            gameplayUI.run();
             
         } catch (NumberFormatException e) {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
                 "Error: Invalid game number. Please enter a number." + EscapeSequences.RESET_TEXT_COLOR);
+        } catch (Exception e) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "Error starting gameplay: " + e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 }
