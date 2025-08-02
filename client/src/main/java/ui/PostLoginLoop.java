@@ -23,7 +23,7 @@ public class PostLoginLoop {
                 } else if (input.equals("create game") || input.equals("cg")) {
                     handleCreateGame(scanner, facade, authToken);
                 } else if (input.startsWith("play ") || input.startsWith("p ") || input.startsWith("observe ") || input.startsWith("o ")) {
-                    handleJoinAndDraw(scanner, facade, authToken, input);
+                    handleJoinAndDraw(scanner, facade, authToken, username, input);
                 } else if (input.equals("logout") || input.equals("lo")) {
                     facade.logout(authToken);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Logged out." + EscapeSequences.RESET_TEXT_COLOR);
@@ -92,7 +92,7 @@ public class PostLoginLoop {
             EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
     }
 
-    private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String input) throws ResponseException {
+    private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String username, String input) throws ResponseException {
         String[] parts = input.split("\\s+");
         if (parts.length < 2) {
             System.out.println("Error: Please specify a game number. Use 'list games' to see available games.");

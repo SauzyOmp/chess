@@ -5,6 +5,7 @@ import model.GameData;
 import model.AuthData;
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public class MySqlDataAccess implements DataAccess {
 
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().serializeNulls().create();
 
     @Override
     public void clear() throws DataAccessException {

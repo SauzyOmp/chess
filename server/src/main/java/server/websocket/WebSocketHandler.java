@@ -95,6 +95,11 @@ public class WebSocketHandler {
             return;
         }
 
+        if (isGameOver(gameData)) {
+            sendError(session, "Error: Game is over");
+            return;
+        }
+
         MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
         ChessMove move = moveCommand.getMove();
 
@@ -102,12 +107,15 @@ public class WebSocketHandler {
             gameData.game().makeMove(move);
             try {
                 dataAccess.updateGame(gameData);
+                gameData = dataAccess.getGame(gameData.gameID());
             } catch (DataAccessException e) {
                 sendError(session, "Error: Failed to update game");
                 return;
             }
             
-            broadcastToAll(gameKey, new LoadGameMessage(gameData.game()));
+            if (!isGameOver(gameData)) {
+                broadcastToAll(gameKey, new LoadGameMessage(gameData.game()));
+            }
             
             String moveDescription = describeMove(move);
             String notification = username + " made move: " + moveDescription;
@@ -125,6 +133,7 @@ public class WebSocketHandler {
             }
         } catch (InvalidMoveException e) {
             sendError(session, "Error: Invalid move");
+            return;
         }
     }
 
@@ -138,6 +147,7 @@ public class WebSocketHandler {
             GameData updatedGame = removePlayer(username, gameData);
             try {
                 dataAccess.updateGame(updatedGame);
+                gameData = dataAccess.getGame(gameData.gameID());
             } catch (DataAccessException e) {
                 sendError(session, "Error: Failed to update game");
                 return;
@@ -157,16 +167,26 @@ public class WebSocketHandler {
             return;
         }
 
+        if (isGameOver(gameData)) {
+            sendError(session, "Error: Game is already over");
+            return;
+        }
+
         gameData.game().setTeamTurn(null);
         try {
             dataAccess.updateGame(gameData);
+            gameData = dataAccess.getGame(gameData.gameID());
         } catch (DataAccessException e) {
             sendError(session, "Error: Failed to update game");
             return;
         }
-        
+
         String notification = username + " resigned the game";
         broadcastToAll(gameKey, new NotificationMessage(notification));
+    }
+
+    private boolean isGameOver(GameData gameData) {
+        return gameData.game().getTeamTurn() == null;
     }
 
     private boolean isPlayer(String username, GameData gameData) {

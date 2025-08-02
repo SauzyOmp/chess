@@ -37,6 +37,7 @@ public class Server {
         }
         port(desiredPort);
         staticFiles.location("web");
+        setupWebSocket();
         before((req, res) -> res.type("application/json"));
 
         setupEndpoints();
@@ -49,7 +50,6 @@ public class Server {
         setupUserEndpoint();
         setupSessionEndpoints();
         setupGameEndpoints();
-        setupWebSocket();
     }
 
     private void setupDbEndpoint() {
