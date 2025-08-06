@@ -2,8 +2,11 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+
+import java.util.Collection;
 
 public class BoardRenderer {
     public static void renderBoard(ChessGame game) {
@@ -11,6 +14,10 @@ public class BoardRenderer {
     }
     
     public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective) {
+        renderBoard(game, perspective, null, null);
+    }
+    
+    public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition, Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
         
         // Determine if we need to flip the board
@@ -33,6 +40,16 @@ public class BoardRenderer {
                 
                 boolean isLightSquare = (displayRow + displayCol) % 2 == 0;
                 String bgColor = isLightSquare ? EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                
+                // Check if this position should be highlighted
+                boolean isSelected = selectedPosition != null && position.equals(selectedPosition);
+                boolean isLegalMove = legalMoves != null && legalMoves.stream().anyMatch(move -> move.getEndPosition().equals(position));
+                
+                if (isSelected) {
+                    bgColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                } else if (isLegalMove) {
+                    bgColor = EscapeSequences.SET_BG_COLOR_GREEN;
+                }
                 
                 if (piece == null) {
                     System.out.print(bgColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);

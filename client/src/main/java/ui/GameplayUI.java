@@ -176,16 +176,24 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
         
         Collection<ChessMove> legalMoves = currentGame.validMoves(position);
         if (legalMoves.isEmpty()) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No legal moves available for piece at " + parts[1] + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No legal moves for " + parts[1] + EscapeSequences.RESET_TEXT_COLOR);
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Legal moves for piece at " + parts[1] + ":" + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Legal moves for " + parts[1] + ":" + EscapeSequences.RESET_TEXT_COLOR);
+            BoardRenderer.renderBoard(currentGame, playerColor, position, legalMoves);
+            
+            // Show the moves in a simplified format
             for (ChessMove move : legalMoves) {
+                String startPos = formatPosition(move.getStartPosition());
+                String endPos = formatPosition(move.getEndPosition());
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + 
-                    EscapeSequences.SET_TEXT_COLOR_GREEN + move.getStartPosition() + 
-                    EscapeSequences.SET_TEXT_COLOR_WHITE + " -> " + 
-                    EscapeSequences.SET_TEXT_COLOR_GREEN + move.getEndPosition() + EscapeSequences.RESET_TEXT_COLOR);
+                    EscapeSequences.SET_TEXT_COLOR_GREEN + startPos + " -> " + endPos + EscapeSequences.RESET_TEXT_COLOR);
             }
         }
+    }
+
+    private String formatPosition(ChessPosition position) {
+        char col = (char)('a' + position.getColumn() - 1);
+        return col + String.valueOf(position.getRow());
     }
 
     private ChessPosition parsePosition(String positionStr) {
