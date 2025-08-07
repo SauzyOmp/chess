@@ -8,6 +8,7 @@ import exception.ResponseException;
 
 import java.util.Collection;
 import java.util.Scanner;
+import chess.ChessPiece;
 
 public class GameplayUI implements WebSocketFacade.GameHandler {
     private final Scanner scanner = new Scanner(System.in);
@@ -81,8 +82,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             "redraw" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (r)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
             " - Redraw the chess board");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
-            "move <start> <end>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (m)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
-            " - Make a move (e.g., move e2 e4)");
+            "move" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (m)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+            " - Make a move (interactive or: move <start> <end>)");
         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
             "highlight <position>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (hl)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
             " - Highlight legal moves for a piece (e.g., highlight e2)");
@@ -122,22 +123,75 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             return;
         }
         
-        if (parts.length != 3) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Usage: move <start> <end> (e.g., move e2 e4)" + EscapeSequences.RESET_TEXT_COLOR);
+        if (currentGame == null) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No game data available." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
         
-        ChessPosition start = parsePosition(parts[1]);
-        ChessPosition end = parsePosition(parts[2]);
-        
-        if (start == null || end == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+        // Check if it's the player's turn
+        if (currentGame.getTeamTurn() != playerColor) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "It's not your turn. Current turn: " + currentGame.getTeamTurn() + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
         
-        ChessMove move = new ChessMove(start, end, null);
+        ChessPosition start, end;
+        
+        if (parts.length == 3) {
+            // Command format: move <start> <end>
+            start = parsePosition(parts[1]);
+            end = parsePosition(parts[2]);
+        } else {
+            // Interactive mode: prompt for positions
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter start position (e.g., e2): " + EscapeSequences.RESET_TEXT_COLOR);
+            String startInput = scanner.nextLine().trim();
+            start = parsePosition(startInput);
+            
+            if (start == null) {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid start position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+                return;
+            }
+            
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter end position (e.g., e4): " + EscapeSequences.RESET_TEXT_COLOR);
+            String endInput = scanner.nextLine().trim();
+            end = parsePosition(endInput);
+            
+            if (end == null) {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid end position format. Use format like 'e4' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+                return;
+            }
+        }
+        
+        // Validate that the piece at start position belongs to the player
+        ChessPiece piece = currentGame.getBoard().getPiece(start);
+        if (piece == null) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No piece at position " + formatPosition(start) + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        
+        if (piece.getTeamColor() != playerColor) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "That piece doesn't belong to you. You are playing as " + playerColor + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        
+        // Check if the move is legal
+        Collection<ChessMove> legalMoves = currentGame.validMoves(start);
+        ChessMove move = null;
+        
+        // Find the exact matching move (including promotion)
+        for (ChessMove legalMove : legalMoves) {
+            if (legalMove.getEndPosition().equals(end)) {
+                move = legalMove;
+                break;
+            }
+        }
+        
+        if (move == null) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid move. Use 'highlight " + formatPosition(start) + "' to see legal moves." + EscapeSequences.RESET_TEXT_COLOR);
+            return;
+        }
+        
         webSocket.makeMove(authToken, gameID, move);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Move submitted: " + parts[1] + " to " + parts[2] + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Move submitted: " + formatPosition(start) + " to " + formatPosition(end) + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private void resignGame() throws Exception {
