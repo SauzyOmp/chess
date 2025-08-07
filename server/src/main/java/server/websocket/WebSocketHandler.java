@@ -123,13 +123,15 @@ public class WebSocketHandler {
             broadcastToOthers(username, gameKey, new NotificationMessage(notification));
             
             if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
-                String checkmateNotification = username + " is in checkmate";
+                String winner = getPlayerUsername(gameData, gameData.game().getTeamTurn() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
+                String loser = getPlayerUsername(gameData, gameData.game().getTeamTurn());
+                String checkmateNotification = "Checkmate! " + winner + " wins! Congratulations!";
                 broadcastToAll(gameKey, new NotificationMessage(checkmateNotification));
             } else if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
-                String checkNotification = username + " is in check";
+                String checkNotification = getPlayerUsername(gameData, gameData.game().getTeamTurn()) + " is in check";
                 broadcastToAll(gameKey, new NotificationMessage(checkNotification));
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
-                String stalemateNotification = "Game ended in stalemate";
+                String stalemateNotification = "Game ended in stalemate - it's a draw!";
                 broadcastToAll(gameKey, new NotificationMessage(stalemateNotification));
             }
         } catch (InvalidMoveException e) {
@@ -173,6 +175,7 @@ public class WebSocketHandler {
             return;
         }
 
+        // Set the game as over by setting team turn to null
         gameData.game().setTeamTurn(null);
         try {
             dataAccess.updateGame(gameData);
@@ -182,8 +185,16 @@ public class WebSocketHandler {
             return;
         }
 
-        String notification = username + " resigned the game";
-        broadcastToAll(gameKey, new NotificationMessage(notification));
+        // Determine the winner (the player who didn't resign)
+        String winner = null;
+        if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
+            winner = gameData.blackUsername();
+        } else if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
+            winner = gameData.whiteUsername();
+        }
+
+        String resignationNotification = username + " resigned. " + winner + " wins!";
+        broadcastToAll(gameKey, new NotificationMessage(resignationNotification));
     }
 
     private boolean isGameOver(GameData gameData) {
@@ -248,6 +259,15 @@ public class WebSocketHandler {
                 connection.session().getRemote().sendString(gson.toJson(message));
             }
         }
+    }
+
+    private String getPlayerUsername(GameData gameData, ChessGame.TeamColor teamColor) {
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            return gameData.whiteUsername();
+        } else if (teamColor == ChessGame.TeamColor.BLACK) {
+            return gameData.blackUsername();
+        }
+        return null; // Should not happen if teamColor is valid
     }
 
     private record Connection(String username, Session session, GameData gameData) {}
