@@ -145,11 +145,11 @@ public class PostLoginLoop {
                     
                     if (selected.whiteUsername() == null) {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "w) " + 
-                            EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.WHITE_KING + " White");
+                            EscapeSequences.SET_TEXT_COLOR_WHITE + "White");
                     }
                     if (selected.blackUsername() == null) {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "b) " + 
-                            EscapeSequences.SET_TEXT_COLOR_BLACK + EscapeSequences.BLACK_KING + " Black");
+                            EscapeSequences.SET_TEXT_COLOR_BLACK + "Black");
                     }
                     
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter choice (w or b): " + 
@@ -169,11 +169,21 @@ public class PostLoginLoop {
                         return;
                     }
                     
-                    facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
-                    String commandUsed = "play " + (choice + 1);
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
-                        " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + 
-                        EscapeSequences.RESET_TEXT_COLOR);
+                    try {
+                        facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
+                        String commandUsed = "play " + (choice + 1);
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
+                            " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + 
+                            EscapeSequences.RESET_TEXT_COLOR);
+                    } catch (ResponseException e) {
+                        if (e.getMessage().contains("game over")) {
+                            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                                "Error: This game is finished and cannot be joined." + EscapeSequences.RESET_TEXT_COLOR);
+                        } else {
+                            throw e;
+                        }
+                        return;
+                    }
                 }
             }
             

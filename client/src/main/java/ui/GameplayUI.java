@@ -45,7 +45,7 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
         }
 
         while (gameActive) {
-            String prompt = "[" + username + " - Game " + gameID + "] > ";
+            String prompt = "[" + username + "] > ";
             System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + prompt + EscapeSequences.RESET_TEXT_COLOR);
             String input = scanner.nextLine().trim();
 
@@ -87,23 +87,41 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
 
     private void showHelp() {
         if (gameOver) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Game Over Commands:" + EscapeSequences.RESET_TEXT_COLOR);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  help, h" + EscapeSequences.RESET_TEXT_COLOR + " - Show this help");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  redraw, r" + EscapeSequences.RESET_TEXT_COLOR + " - Redraw the board");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  leave, l" + EscapeSequences.RESET_TEXT_COLOR + " - Leave the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + 
-                EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
+                "Game Over Commands:" + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "help" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (h)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Show this help");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "redraw" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (r)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Redraw the board");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "leave" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (l)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Leave the game");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "highlight <pos>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (hl)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Highlight legal moves");
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Available Commands:" + EscapeSequences.RESET_TEXT_COLOR);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  help, h" + EscapeSequences.RESET_TEXT_COLOR + " - Show this help");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  redraw, r" + EscapeSequences.RESET_TEXT_COLOR + " - Redraw the board");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  leave, l" + EscapeSequences.RESET_TEXT_COLOR + " - Leave the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  move <start> <end>, m <start> <end>" + 
-                EscapeSequences.RESET_TEXT_COLOR + " - Make a move");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  resign, rs" + 
-                EscapeSequences.RESET_TEXT_COLOR + " - Resign the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + 
-                EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
+                "Available Commands:" + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "help" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (h)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Show this help");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "redraw" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (r)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Redraw the board");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "leave" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (l)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Leave the game");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "move" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (m)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Make a move");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_RED + 
+                "resign" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (rs)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Resign the game");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  " + EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "highlight <pos>" + EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + " (hl)" + EscapeSequences.SET_TEXT_COLOR_WHITE + 
+                " - Highlight legal moves");
         }
     }
 

@@ -67,6 +67,12 @@ public class WebSocketHandler {
         String username = authData.username();
         String gameKey = String.valueOf(gameData.gameID());
         
+        // Check if game is over and notify the user
+        if (isGameOver(gameData)) {
+            sendError(session, "Error: This game is finished");
+            return;
+        }
+        
         Connection connection = new Connection(username, session, gameData);
         connections.put(username, connection);
 
@@ -91,13 +97,13 @@ public class WebSocketHandler {
             return;
         }
 
-        if (!isPlayerTurn(username, gameData)) {
-            sendError(session, "Error: Not your turn");
+        if (isGameOver(gameData)) {
+            sendError(session, "Error: Game is over");
             return;
         }
 
-        if (isGameOver(gameData)) {
-            sendError(session, "Error: Game is over");
+        if (!isPlayerTurn(username, gameData)) {
+            sendError(session, "Error: Not your turn");
             return;
         }
 
@@ -114,9 +120,8 @@ public class WebSocketHandler {
                 return;
             }
             
-            if (!isGameOver(gameData)) {
-                broadcastToAll(gameKey, new LoadGameMessage(gameData.game()));
-            }
+            // Always send the updated game state, even if the game is over
+            broadcastToAll(gameKey, new LoadGameMessage(gameData.game()));
             
             String moveDescription = describeMove(move);
             String notification = username + " made move: " + moveDescription;
@@ -129,12 +134,28 @@ public class WebSocketHandler {
                 String loser = getPlayerUsername(gameData, gameData.game().getTeamTurn());
                 String checkmateNotification = "Checkmate! " + winner + " wins! Congratulations!";
                 broadcastToAll(gameKey, new NotificationMessage(checkmateNotification));
+                
+                // Mark game as over
+                gameData.game().setTeamTurn(null);
+                try {
+                    dataAccess.updateGame(gameData);
+                } catch (DataAccessException e) {
+                    // Log error but don't fail the game over notification
+                }
             } else if (gameData.game().isInCheck(gameData.game().getTeamTurn())) {
                 String checkNotification = getPlayerUsername(gameData, gameData.game().getTeamTurn()) + " is in check";
                 broadcastToAll(gameKey, new NotificationMessage(checkNotification));
             } else if (gameData.game().isInStalemate(gameData.game().getTeamTurn())) {
                 String stalemateNotification = "Game ended in stalemate - it's a draw!";
                 broadcastToAll(gameKey, new NotificationMessage(stalemateNotification));
+                
+                // Mark game as over
+                gameData.game().setTeamTurn(null);
+                try {
+                    dataAccess.updateGame(gameData);
+                } catch (DataAccessException e) {
+                    // Log error but don't fail the game over notification
+                }
             }
         } catch (InvalidMoveException e) {
             sendError(session, "Error: Invalid move");
@@ -200,7 +221,18 @@ public class WebSocketHandler {
     }
 
     private boolean isGameOver(GameData gameData) {
-        return gameData.game().getTeamTurn() == null;
+        // Check if teamTurn is null (explicitly marked as over)
+        if (gameData.game().getTeamTurn() == null) {
+            return true;
+        }
+        
+        // Check if the current player is in checkmate or stalemate
+        ChessGame.TeamColor currentTurn = gameData.game().getTeamTurn();
+        if (currentTurn != null) {
+            return gameData.game().isInCheckmate(currentTurn) || gameData.game().isInStalemate(currentTurn);
+        }
+        
+        return false;
     }
 
     private boolean isPlayer(String username, GameData gameData) {

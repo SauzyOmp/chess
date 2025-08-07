@@ -39,6 +39,11 @@ public class GameService {
 
         GameData existing = dao.getGame(req.gameID());
 
+        // Check if game is over
+        if (existing.game().getTeamTurn() == null) {
+            throw new DataAccessException("game over");
+        }
+
         String color = req.playerColor();
         boolean whiteTaken = existing.whiteUsername() != null;
         boolean blackTaken = existing.blackUsername() != null;

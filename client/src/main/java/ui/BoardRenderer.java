@@ -75,7 +75,7 @@ public class BoardRenderer {
     }
 
     private static String getPieceSymbol(ChessPiece piece) {
-        return switch (piece.getPieceType()) {
+        String pieceSymbol = switch (piece.getPieceType()) {
             case KING -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
                     ? EscapeSequences.WHITE_KING
                     : EscapeSequences.BLACK_KING;
@@ -95,5 +95,12 @@ public class BoardRenderer {
                     ? EscapeSequences.WHITE_PAWN
                     : EscapeSequences.BLACK_PAWN;
         };
+        
+        // Apply colors: blue for white pieces, red for black pieces
+        String colorCode = piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                ? EscapeSequences.SET_TEXT_COLOR_BLUE
+                : EscapeSequences.SET_TEXT_COLOR_RED;
+        
+        return colorCode + pieceSymbol + EscapeSequences.RESET_TEXT_COLOR;
     }
 }
