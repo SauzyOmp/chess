@@ -12,79 +12,88 @@ public class BoardRenderer {
     public static void renderBoard(ChessGame game) {
         renderBoard(game, null);
     }
-    
+
     public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective) {
         renderBoard(game, perspective, null, null);
     }
-    
-    public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition, Collection<ChessMove> legalMoves) {
+
+    public static void renderBoard(ChessGame game,
+                                   ChessGame.TeamColor perspective,
+                                   ChessPosition selectedPosition,
+                                   Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
-        
-        // Determine if we need to flip the board - flip when player is BLACK so their pieces appear at bottom
-        boolean flipBoard = (perspective == ChessGame.TeamColor.BLACK);
-        
+        boolean flipBoard = perspective == ChessGame.TeamColor.BLACK;
+
         System.out.print("   ");
-        for (int col = 1; col <= 8; col++) {
-            char colChar = flipBoard ? (char)('h' - col + 1) : (char)('a' + col - 1);
-            System.out.print(" " + colChar + " ");
+        for (char file = 'a'; file <= 'h'; file++) {
+            System.out.print(" " + file + " ");
         }
         System.out.println();
-        
-        for (int displayRow = 1; displayRow <= 8; displayRow++) {
-            int actualRow = flipBoard ? displayRow : (9 - displayRow);
-            System.out.print(" " + displayRow + " ");
-            for (int displayCol = 1; displayCol <= 8; displayCol++) {
-                int actualCol = flipBoard ? (9 - displayCol) : displayCol;
+
+        for (int i = 0; i < 8; i++) {
+            int rank = flipBoard ? i + 1 : 8 - i;
+            System.out.print(" " + rank + " ");
+
+            for (int fileIndex = 1; fileIndex <= 8; fileIndex++) {
+                int actualRow = rank;
+                int actualCol = fileIndex;
                 ChessPosition position = new ChessPosition(actualRow, actualCol);
                 ChessPiece piece = board.getPiece(position);
-                
-                boolean isLightSquare = (displayRow + displayCol) % 2 == 0;
-                String bgColor = isLightSquare ? EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                
-                // Check if this position should be highlighted
+
+                // Fix square coloring to alternate correctly
+                boolean isLightSquare = (rank + fileIndex) % 2 == 1;
+                String bgColor = isLightSquare
+                        ? EscapeSequences.SET_BG_COLOR_WHITE
+                        : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+
                 boolean isSelected = selectedPosition != null && position.equals(selectedPosition);
-                boolean isLegalMove = legalMoves != null && legalMoves.stream().anyMatch(move -> move.getEndPosition().equals(position));
-                
+                boolean isLegal = legalMoves != null && legalMoves.stream()
+                        .anyMatch(m -> m.getEndPosition().equals(position));
+
                 if (isSelected) {
                     bgColor = EscapeSequences.SET_BG_COLOR_YELLOW;
-                } else if (isLegalMove) {
+                } else if (isLegal) {
                     bgColor = EscapeSequences.SET_BG_COLOR_GREEN;
                 }
-                
-                if (piece == null) {
-                    System.out.print(bgColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-                } else {
-                    String pieceSymbol = getPieceSymbol(piece);
-                    System.out.print(bgColor + pieceSymbol + EscapeSequences.RESET_BG_COLOR);
-                }
+
+                String cell = piece == null
+                        ? EscapeSequences.EMPTY
+                        : getPieceSymbol(piece);
+
+                System.out.print(bgColor + cell + EscapeSequences.RESET_BG_COLOR);
             }
-            System.out.println(" " + displayRow);
+            System.out.println(" " + rank);
         }
-        
+
         System.out.print("   ");
-        for (int col = 1; col <= 8; col++) {
-            char colChar = flipBoard ? (char)('h' - col + 1) : (char)('a' + col - 1);
-            System.out.print(" " + colChar + " ");
+        for (char file = 'a'; file <= 'h'; file++) {
+            System.out.print(" " + file + " ");
         }
         System.out.println();
-        
+
         System.out.println("Current turn: " + game.getTeamTurn());
     }
-    
+
     private static String getPieceSymbol(ChessPiece piece) {
         return switch (piece.getPieceType()) {
-            case KING -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_KING : EscapeSequences.BLACK_KING;
-            case QUEEN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_QUEEN : EscapeSequences.BLACK_QUEEN;
-            case BISHOP -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_BISHOP : EscapeSequences.BLACK_BISHOP;
-            case KNIGHT -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_KNIGHT : EscapeSequences.BLACK_KNIGHT;
-            case ROOK -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_ROOK : EscapeSequences.BLACK_ROOK;
-            case PAWN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE ? 
-                EscapeSequences.WHITE_PAWN : EscapeSequences.BLACK_PAWN;
+            case KING -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_KING
+                    : EscapeSequences.BLACK_KING;
+            case QUEEN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_QUEEN
+                    : EscapeSequences.BLACK_QUEEN;
+            case BISHOP -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_BISHOP
+                    : EscapeSequences.BLACK_BISHOP;
+            case KNIGHT -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_KNIGHT
+                    : EscapeSequences.BLACK_KNIGHT;
+            case ROOK -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_ROOK
+                    : EscapeSequences.BLACK_ROOK;
+            case PAWN -> piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                    ? EscapeSequences.WHITE_PAWN
+                    : EscapeSequences.BLACK_PAWN;
         };
     }
-} 
+}
