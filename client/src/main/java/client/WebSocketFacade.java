@@ -51,19 +51,7 @@ public class WebSocketFacade {
         }
     }
 
-    @OnClose
-    @SuppressWarnings("unused")
-    public void onClose(Session session, CloseReason closeReason) {
-        // WebSocket connection closed - notify the game handler
-        gameHandler.printMessage("WebSocket connection closed: " + closeReason.getReasonPhrase());
-    }
 
-    @OnError
-    @SuppressWarnings("unused")
-    public void onError(Session session, Throwable throwable) {
-        // WebSocket error occurred - notify the game handler
-        gameHandler.printMessage("WebSocket error: " + throwable.getMessage());
-    }
 
     public void connect(String authToken, Integer gameID) throws IOException {
         UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
