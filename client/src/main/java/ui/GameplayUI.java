@@ -91,7 +91,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  help, h" + EscapeSequences.RESET_TEXT_COLOR + " - Show this help");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  redraw, r" + EscapeSequences.RESET_TEXT_COLOR + " - Redraw the board");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  leave, l" + EscapeSequences.RESET_TEXT_COLOR + " - Leave the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + 
+                EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
         } else {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Available Commands:" + EscapeSequences.RESET_TEXT_COLOR);
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  help, h" + EscapeSequences.RESET_TEXT_COLOR + " - Show this help");
@@ -173,15 +174,18 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
         // Validate that the piece at start position belongs to the player
         ChessPiece piece = currentGame.getBoard().getPiece(start);
         if (piece == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No piece at position " + formatPosition(start) + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "No piece at position " + 
+                formatPosition(start) + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
         
         if (piece.getTeamColor() != playerColor) {
             String pieceColor = piece.getTeamColor() == ChessGame.TeamColor.WHITE ? "WHITE" : "BLACK";
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "That piece doesn't belong to you. You are playing as " + playerColor + 
-                ", but the piece at " + formatPosition(start) + " is " + pieceColor + "." + EscapeSequences.RESET_TEXT_COLOR);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Your pieces are at the bottom of the board (rows 1-2)." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "That piece doesn't belong to you. You are playing as " + 
+                playerColor + ", but the piece at " + formatPosition(start) + " is " + pieceColor + "." + 
+                EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "Your pieces are at the bottom of the board (rows 1-2)." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
@@ -192,12 +196,14 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
                 .orElse(null);
 
         if (move == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid move. Use 'highlight " + formatPosition(start) + "' to see legal moves." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid move. Use 'highlight " + 
+                formatPosition(start) + "' to see legal moves." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
         webSocket.makeMove(authToken, gameID, move);
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Move submitted: " + formatPosition(start) + " to " + formatPosition(end) + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Move submitted: " + 
+            formatPosition(start) + " to " + formatPosition(end) + EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private void resignGame() throws Exception {
