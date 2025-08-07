@@ -20,8 +20,8 @@ public class BoardRenderer {
     public static void renderBoard(ChessGame game, ChessGame.TeamColor perspective, ChessPosition selectedPosition, Collection<ChessMove> legalMoves) {
         ChessBoard board = game.getBoard();
         
-        // Determine if we need to flip the board
-        boolean flipBoard = (perspective == ChessGame.TeamColor.WHITE);
+        // Determine if we need to flip the board - flip when player is BLACK so their pieces appear at bottom
+        boolean flipBoard = (perspective == ChessGame.TeamColor.BLACK);
         
         System.out.print("   ");
         for (int col = 1; col <= 8; col++) {

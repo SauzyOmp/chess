@@ -173,11 +173,9 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             return;
         }
         
-        // Check if the move is legal
         Collection<ChessMove> legalMoves = currentGame.validMoves(start);
         ChessMove move = null;
         
-        // Find the exact matching move (including promotion)
         for (ChessMove legalMove : legalMoves) {
             if (legalMove.getEndPosition().equals(end)) {
                 move = legalMove;
@@ -277,6 +275,14 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
 
     @Override
     public void printMessage(String message) {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + message + EscapeSequences.RESET_TEXT_COLOR);
+        if (message.contains(" made move:")) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "\n" + message + EscapeSequences.RESET_TEXT_COLOR);
+            if (currentGame != null) {
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Board updated:" + EscapeSequences.RESET_TEXT_COLOR);
+                BoardRenderer.renderBoard(currentGame, playerColor);
+            }
+        } else {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + message + EscapeSequences.RESET_TEXT_COLOR);
+        }
     }
 } 

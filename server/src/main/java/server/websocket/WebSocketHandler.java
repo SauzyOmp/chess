@@ -21,6 +21,7 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import chess.ChessPosition;
 
 @WebSocket
 public class WebSocketHandler {
@@ -214,7 +215,14 @@ public class WebSocketHandler {
     }
 
     private String describeMove(ChessMove move) {
-        return move.getStartPosition().toString() + " to " + move.getEndPosition().toString();
+        String startPos = formatPosition(move.getStartPosition());
+        String endPos = formatPosition(move.getEndPosition());
+        return startPos + " to " + endPos;
+    }
+    
+    private String formatPosition(ChessPosition position) {
+        char col = (char)('a' + position.getColumn() - 1);
+        return col + String.valueOf(position.getRow());
     }
 
     private void sendLoadGame(Session session, ChessGame game) throws IOException {
