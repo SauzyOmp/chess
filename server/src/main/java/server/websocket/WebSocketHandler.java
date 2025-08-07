@@ -123,7 +123,9 @@ public class WebSocketHandler {
             broadcastToOthers(username, gameKey, new NotificationMessage(notification));
             
             if (gameData.game().isInCheckmate(gameData.game().getTeamTurn())) {
-                String winner = getPlayerUsername(gameData, gameData.game().getTeamTurn() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE);
+                ChessGame.TeamColor winningColor = gameData.game().getTeamTurn() == ChessGame.TeamColor.WHITE ? 
+                    ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+                String winner = getPlayerUsername(gameData, winningColor);
                 String loser = getPlayerUsername(gameData, gameData.game().getTeamTurn());
                 String checkmateNotification = "Checkmate! " + winner + " wins! Congratulations!";
                 broadcastToAll(gameKey, new NotificationMessage(checkmateNotification));

@@ -31,7 +31,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             this.webSocket = new WebSocketFacade(serverUrl.replace("http", "ws") + "/ws", this);
             this.webSocket.connect(authToken, gameID);
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Failed to connect to WebSocket: " + e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Failed to connect to WebSocket: " + 
+                e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 
@@ -58,13 +59,17 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
 
     private void processCommand(String input) throws Exception {
         String[] parts = input.trim().split("\\s+");
-        if (parts.length == 0) return;
+        if (parts.length == 0) {
+            return;
+        }
 
         String command = parts[0].toLowerCase();
         
         // Check if game is over and disable certain commands
-        if (gameOver && (command.equals("move") || command.equals("m") || command.equals("resign") || command.equals("r"))) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "The game is over. Use 'leave' to exit and start a new game." + EscapeSequences.RESET_TEXT_COLOR);
+        if (gameOver && (command.equals("move") || command.equals("m") || 
+            command.equals("resign") || command.equals("r"))) {
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "The game is over. Use 'leave' to exit and start a new game." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
@@ -75,7 +80,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             case "move", "m" -> makeMove(parts);
             case "resign", "rs" -> resignGame();
             case "highlight", "hl" -> highlightLegalMoves(parts);
-            default -> System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Unknown command. Type 'help' for available commands." + EscapeSequences.RESET_TEXT_COLOR);
+            default -> System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "Unknown command. Type 'help' for available commands." + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 
@@ -91,9 +97,12 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  help, h" + EscapeSequences.RESET_TEXT_COLOR + " - Show this help");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  redraw, r" + EscapeSequences.RESET_TEXT_COLOR + " - Redraw the board");
             System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  leave, l" + EscapeSequences.RESET_TEXT_COLOR + " - Leave the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  move <start> <end>, m <start> <end>" + EscapeSequences.RESET_TEXT_COLOR + " - Make a move");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  resign, rs" + EscapeSequences.RESET_TEXT_COLOR + " - Resign the game");
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  move <start> <end>, m <start> <end>" + 
+                EscapeSequences.RESET_TEXT_COLOR + " - Make a move");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  resign, rs" + 
+                EscapeSequences.RESET_TEXT_COLOR + " - Resign the game");
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "  highlight <pos>, hl <pos>" + 
+                EscapeSequences.RESET_TEXT_COLOR + " - Highlight legal moves");
         }
     }
 
@@ -101,7 +110,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
         if (currentGame != null) {
             BoardRenderer.renderBoard(currentGame, playerColor);
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No game data available to display." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "No game data available to display." + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 
@@ -112,7 +122,8 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             gameActive = false;
             System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "You have left the game." + EscapeSequences.RESET_TEXT_COLOR);
         } catch (Exception e) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error leaving game: " + e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Error leaving game: " + 
+                e.getMessage() + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 
@@ -123,12 +134,14 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
         }
 
         if (currentGame == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No game data available." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "No game data available." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
         if (currentGame.getTeamTurn() != playerColor) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "It's not your turn. Current turn: " + currentGame.getTeamTurn() + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "It's not your turn. Current turn: " + 
+                currentGame.getTeamTurn() + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
@@ -142,14 +155,17 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             String startInput = scanner.nextLine().trim();
             start = parsePosition(startInput);
             if (start == null) {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid start position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                    "Invalid start position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
                 return;
             }
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter end position (e.g., e4): " + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + "Enter end position (e.g., e4): " + 
+                EscapeSequences.RESET_TEXT_COLOR);
             String endInput = scanner.nextLine().trim();
             end = parsePosition(endInput);
             if (end == null) {
-                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid end position format. Use format like 'e4' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                    "Invalid end position format. Use format like 'e4' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
                 return;
             }
         }
@@ -190,48 +206,60 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
             return;
         }
 
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Are you sure you want to resign? (yes/no): " + EscapeSequences.RESET_TEXT_COLOR);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+            "Are you sure you want to resign? (yes/no): " + EscapeSequences.RESET_TEXT_COLOR);
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
         if (confirmation.equals("yes") || confirmation.equals("y")) {
             webSocket.resign(authToken, gameID);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "You have resigned the game." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "You have resigned the game." + EscapeSequences.RESET_TEXT_COLOR);
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Resignation cancelled." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + 
+                "Resignation cancelled." + EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 
     private void highlightLegalMoves(String[] parts) {
         if (parts.length != 2) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Usage: highlight <position> (e.g., highlight e2)" + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "Usage: highlight <position> (e.g., highlight e2)" + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
         ChessPosition position = parsePosition(parts[1]);
         if (position == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                "Invalid position format. Use format like 'e2' or 'a1'." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
         if (currentGame == null) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No game data available." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "No game data available." + EscapeSequences.RESET_TEXT_COLOR);
             return;
         }
 
         Collection<ChessMove> legalMoves = currentGame.validMoves(position);
         if (legalMoves.isEmpty()) {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "No legal moves for " + parts[1] + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "No legal moves for " + parts[1] + EscapeSequences.RESET_TEXT_COLOR);
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Legal moves for " + parts[1] + " (" + legalMoves.size() + " moves):" + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Legal moves for " + parts[1] + 
+                " (" + legalMoves.size() + " moves):" + EscapeSequences.RESET_TEXT_COLOR);
             
             // Show moves in a compact format above the board
             StringBuilder moveList = new StringBuilder();
             int count = 0;
             for (ChessMove move : legalMoves) {
-                if (count > 0) moveList.append(", ");
+                if (count > 0) {
+                    moveList.append(", ");
+                }
                 moveList.append(formatPosition(move.getEndPosition()));
                 count++;
-                if (count % 8 == 0) moveList.append("\n");
+                if (count % 8 == 0) {
+                    moveList.append("\n");
+                }
             }
             System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + moveList.toString() + EscapeSequences.RESET_TEXT_COLOR);
             
@@ -281,12 +309,16 @@ public class GameplayUI implements WebSocketFacade.GameHandler {
                 System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Board updated:" + EscapeSequences.RESET_TEXT_COLOR);
                 BoardRenderer.renderBoard(currentGame, playerColor);
             }
-        } else if (message.contains(" wins!") || message.contains("Checkmate!") || message.contains("stalemate") || message.contains("resigned")) {
+        } else if (message.contains(" wins!") || message.contains("Checkmate!") || 
+            message.contains("stalemate") || message.contains("resigned")) {
             gameOver = true;
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "\n" + message + EscapeSequences.RESET_TEXT_COLOR);
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Game over! Use 'leave' to exit and start a new game." + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "\n" + message + 
+                EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                "Game over! Use 'leave' to exit and start a new game." + EscapeSequences.RESET_TEXT_COLOR);
         } else {
-            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + message + EscapeSequences.RESET_TEXT_COLOR);
+            System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "\n" + message + 
+                EscapeSequences.RESET_TEXT_COLOR);
         }
     }
 }

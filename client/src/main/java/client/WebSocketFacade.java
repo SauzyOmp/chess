@@ -53,11 +53,13 @@ public class WebSocketFacade {
 
     @OnClose
     public void onClose(Session session, CloseReason closeReason) {
+        // WebSocket connection closed - notify the game handler
         gameHandler.printMessage("WebSocket connection closed: " + closeReason.getReasonPhrase());
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
+        // WebSocket error occurred - notify the game handler
         gameHandler.printMessage("WebSocket error: " + throwable.getMessage());
     }
 

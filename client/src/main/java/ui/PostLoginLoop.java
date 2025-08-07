@@ -89,7 +89,8 @@ public class PostLoginLoop {
             result.gameID() + ")" + EscapeSequences.RESET_TEXT_COLOR);
         System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Use command " + 
             EscapeSequences.SET_TEXT_COLOR_GREEN + "play " + gamePosition + 
-            EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + EscapeSequences.RESET_TEXT_COLOR);
+            EscapeSequences.SET_TEXT_COLOR_YELLOW + " to join" + 
+            EscapeSequences.RESET_TEXT_COLOR);
     }
 
     private void handleJoinAndDraw(Scanner scanner, ServerFacade facade, String authToken, String username, String input) throws ResponseException {
@@ -119,23 +120,28 @@ public class PostLoginLoop {
             } else {
                 // Check if user is already playing in this game
                 if (username.equals(selected.whiteUsername())) {
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "You are already playing in this game as " + 
-                        EscapeSequences.SET_TEXT_COLOR_WHITE + "WHITE" + EscapeSequences.SET_TEXT_COLOR_YELLOW + "." + EscapeSequences.RESET_TEXT_COLOR);
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                        "You are already playing in this game as " + 
+                        EscapeSequences.SET_TEXT_COLOR_WHITE + "WHITE" + 
+                        EscapeSequences.SET_TEXT_COLOR_YELLOW + "." + EscapeSequences.RESET_TEXT_COLOR);
                     playerColor = ChessGame.TeamColor.WHITE;
                 } else if (username.equals(selected.blackUsername())) {
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + "You are already playing in this game as " + 
-                        EscapeSequences.SET_TEXT_COLOR_BLACK + "BLACK" + EscapeSequences.SET_TEXT_COLOR_YELLOW + "." + EscapeSequences.RESET_TEXT_COLOR);
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                        "You are already playing in this game as " + 
+                        EscapeSequences.SET_TEXT_COLOR_BLACK + "BLACK" + 
+                        EscapeSequences.SET_TEXT_COLOR_YELLOW + "." + EscapeSequences.RESET_TEXT_COLOR);
                     playerColor = ChessGame.TeamColor.BLACK;
                 } else {
                     // User is not in the game yet, let them choose a color
                     // Check if positions are already taken
                     if (selected.whiteUsername() != null && selected.blackUsername() != null) {
-                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + "This game is full. Both positions are already taken." + EscapeSequences.RESET_TEXT_COLOR);
+                        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
+                            "This game is full. Both positions are already taken." + EscapeSequences.RESET_TEXT_COLOR);
                         return;
                     }
                     
-                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + EscapeSequences.SET_TEXT_BOLD + 
-                        "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
+                    System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + 
+                        EscapeSequences.SET_TEXT_BOLD + "Choose your color:" + EscapeSequences.RESET_TEXT_COLOR);
                     
                     if (selected.whiteUsername() == null) {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + "w) " + 
@@ -158,14 +164,16 @@ public class PostLoginLoop {
                         playerColor = ChessGame.TeamColor.BLACK;
                     } else {
                         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + 
-                            "Invalid choice or position already taken. Please choose an available position." + EscapeSequences.RESET_TEXT_COLOR);
+                            "Invalid choice or position already taken. Please choose an available position." + 
+                            EscapeSequences.RESET_TEXT_COLOR);
                         return;
                     }
                     
                     facade.joinGame(authToken, String.valueOf(selected.gameID()), role);
                     String commandUsed = "play " + (choice + 1);
                     System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + "Joined game as " + role + 
-                        " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + EscapeSequences.RESET_TEXT_COLOR);
+                        " using command: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + commandUsed + 
+                        EscapeSequences.RESET_TEXT_COLOR);
                 }
             }
             
